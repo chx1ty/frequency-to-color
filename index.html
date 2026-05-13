@@ -1,414 +1,928 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-<style>
-body { font-family: var(--font-sans); padding: 1rem; background: transparent; }
-.container { max-width: 680px; margin: 0 auto; }
-.header { text-align: center; margin-bottom: 2rem; }
-.header h2 { font-size: 18px; font-weight: 500; margin: 0 0 0.5rem 0; }
-.header p { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音聲光球採集系統</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --accent: #0066cc;
+            --border: #ddd;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #1a1a1a;
+                --bg-secondary: #2d2d2d;
+                --text-primary: #e8e8e8;
+                --text-secondary: #b0b0b0;
+                --border: #444;
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 0.5rem; }
+        .header p { font-size: 14px; color: var(--text-secondary); }
 
-.control-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 2rem; }
-.slider-group { padding: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); }
-.slider-label { font-size: 13px; font-weight: 500; margin-bottom: 8px; color: var(--color-text-primary); }
-.slider-value { font-size: 14px; font-weight: 500; color: var(--color-text-info); margin-top: 4px; }
-input[type="range"] { width: 100%; height: 6px; cursor: pointer; }
+        .lang-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .lang-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+        }
 
-.spectrum-bar { height: 80px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
-.spectrum-indicator { position: absolute; top: 0; width: 2px; height: 100%; background: rgba(0,0,0,0.3); z-index: 10; }
-.spectrum-labels { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-bottom: 1rem; }
-.spectrum-label { font-size: 11px; text-align: center; color: var(--color-text-secondary); }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
 
-.sphere-display { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 2rem; }
-.sphere-container { flex: 0 0 120px; }
-.sphere { width: 120px; height: 120px; border-radius: 50%; box-shadow: 0 0 0 1px var(--color-border-tertiary), 0 8px 24px rgba(0,0,0,0.15); }
-.sphere-info { flex: 1; padding: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); }
-.info-row { display: grid; grid-template-columns: 80px 1fr; gap: 16px; margin: 10px 0; font-size: 13px; }
-.info-label { color: var(--color-text-secondary); font-weight: 500; }
-.info-value { color: var(--color-text-primary); font-family: var(--font-mono); }
+        .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
 
-.color-spectrum { margin-bottom: 2rem; }
-.spectrum-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
 
-.preset-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 2rem; }
-.preset-btn { padding: 10px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; }
-.preset-btn:hover { background: var(--color-background-tertiary); border-color: var(--color-border-primary); }
-.preset-btn.active { background: var(--color-text-info); color: white; border-color: var(--color-text-info); }
+        /* 標籤 */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
 
-.comparison-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 2rem; }
-.comparison-table td { padding: 10px; border-bottom: 0.5px solid var(--color-border-tertiary); }
-.comparison-table td:first-child { color: var(--color-text-secondary); width: 35%; }
-.comparison-table td:nth-child(2) { color: var(--color-text-info); font-weight: 500; width: 25%; }
-.comparison-table td:nth-child(3) { text-align: center; width: 20%; }
-.comparison-table td:nth-child(4) { color: var(--color-text-secondary); font-size: 11px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-.formula-section { padding: 1rem; background: var(--color-background-secondary); border-radius: var(--border-radius-md); margin-bottom: 2rem; font-family: var(--font-mono); font-size: 12px; }
-.formula-line { margin: 6px 0; }
+        /* 球體 */
+        .sphere-container {
+            width: 100%;
+            height: 300px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sphere {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: hsl(180, 85%, 50%);
+            box-shadow: 0 0 0 1px var(--border), 0 8px 24px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+        .sphere::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            filter: blur(30px);
+            opacity: 0.3;
+            top: 0;
+            left: 0;
+        }
 
-.frequency-scale { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-bottom: 2rem; }
-.freq-box { padding: 12px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); text-align: center; border: 0.5px solid var(--color-border-tertiary); }
-.freq-hz { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
-.freq-color { width: 100%; height: 30px; border-radius: 4px; margin-bottom: 4px; }
-.freq-name { font-size: 11px; color: var(--color-text-primary); font-weight: 500; }
-</style>
+        /* 控制項 */
+        .control-item {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+        }
+        .control-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+        .control-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        input[type="range"], input[type="number"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+        input[type="range"] {
+            height: 6px;
+            cursor: pointer;
+        }
+        input[type="number"] {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .control-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+        }
+
+        /* 按鈕 */
+        .button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        .button:hover:not(:disabled) {
+            background: var(--bg-primary);
+            border-color: var(--accent);
+        }
+        .button.primary {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            font-size: 16px;
+        }
+        .button.primary:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 狀態 */
+        .status-display {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            font-size: 12px;
+        }
+        .status-label {
+            font-weight: 600;
+        }
+        .status-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* 計時器 */
+        .timer {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent);
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* 信息框 */
+        .info-box {
+            padding: 1rem;
+            background: #e6f2ff;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        @media (prefers-color-scheme: dark) {
+            .info-box { background: #1a2a3a; }
+        }
+
+        .error-box {
+            padding: 1rem;
+            background: #ffe6e6;
+            border-radius: 8px;
+            border-left: 3px solid #ff6600;
+            color: #ff6600;
+            font-size: 12px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* 結果 */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .result-item {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+        .result-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .result-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* 導出 */
+        .export-code {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            font-family: monospace;
+            font-size: 10px;
+            overflow-x: auto;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">
-    <h2>頻率到顏色轉換 (修正版)</h2>
-    <p>20Hz (紅) → 20kHz (紫) - 正確的對數映射</p>
-  </div>
+    <!-- 標題 -->
+    <div class="header">
+        <div>
+            <h1 id="title">🎤 音聲光球採集系統</h1>
+            <p id="subtitle">觸發式錄音 → 固定時間偵測 → 分析生成光球數據</p>
+        </div>
+        <div class="lang-selector">
+            <button class="lang-btn active" onclick="changeLang('zh')">中文</button>
+            <button class="lang-btn" onclick="changeLang('en')">English</button>
+            <button class="lang-btn" onclick="changeLang('ko')">한국어</button>
+        </div>
+    </div>
 
-  <!-- 控制面板 -->
-  <div class="control-panel">
-    <div class="slider-group">
-      <div class="slider-label">頻譜質心 (SC)：</div>
-      <input type="range" id="scSlider" min="20" max="20000" value="1000" step="5" style="width: 100%;">
-      <div class="slider-value"><span id="scValue">1000</span> Hz</div>
-    </div>
-    <div class="slider-group">
-      <div class="slider-label">飽和度 (Saturation)：</div>
-      <input type="range" id="satSlider" min="0" max="100" value="85" step="1" style="width: 100%;">
-      <div class="slider-value"><span id="satValue">85</span>%</div>
-    </div>
-  </div>
+    <!-- 主要內容 -->
+    <div class="main-grid">
+        <!-- 左側 -->
+        <div class="card">
+            <div class="card-title" id="lbl_preview">💡 光球預覽</div>
+            <div class="sphere-container">
+                <div class="sphere" id="sphere"></div>
+            </div>
+            <div class="status-display" style="margin-top: 1.5rem;">
+                <div class="status-item">
+                    <span class="status-label" id="lbl_size">球的大小</span>
+                    <span class="status-value" id="displayRadius">1.0 RU</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label" id="lbl_glow">發光亮度</span>
+                    <span class="status-value" id="displayGlow">0.50</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label" id="lbl_color">球的顏色</span>
+                    <span class="status-value" id="displayHue">180° (青)</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label" id="lbl_texture">表面紋理</span>
+                    <span class="status-value" id="displayRough">0.30</span>
+                </div>
+            </div>
+        </div>
 
-  <!-- 色譜條 -->
-  <div class="color-spectrum">
-    <div class="spectrum-title">完整色譜映射 (20Hz - 20kHz)：</div>
-    <div class="spectrum-bar" id="spectrumBar">
-      <div class="spectrum-indicator" id="spectrumIndicator"></div>
-    </div>
-    <div class="spectrum-labels">
-      <div class="spectrum-label">20Hz<br>🔴 紅</div>
-      <div class="spectrum-label">100Hz<br>橙</div>
-      <div class="spectrum-label">500Hz<br>黃</div>
-      <div class="spectrum-label">2kHz<br>綠</div>
-      <div class="spectrum-label">5kHz<br>青</div>
-      <div class="spectrum-label">8kHz<br>藍</div>
-      <div class="spectrum-label">12kHz<br>靛</div>
-      <div class="spectrum-label">20kHz<br>🟣 紫</div>
-    </div>
-  </div>
+        <!-- 右側 -->
+        <div class="card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('trigger')" id="tab_trigger">📍 觸發採集</button>
+                <button class="tab-btn" onclick="switchTab('manual')" id="tab_manual">⚙️ 手動調整</button>
+            </div>
 
-  <!-- 光球顯示 -->
-  <div class="sphere-display">
-    <div class="sphere-container">
-      <div class="sphere" id="sphereColor"></div>
-    </div>
-    <div class="sphere-info">
-      <div class="info-row">
-        <div class="info-label">頻率：</div>
-        <div class="info-value"><span id="infoFreq">1000</span> Hz</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">色調 (H)：</div>
-        <div class="info-value"><span id="infoHue">180</span>°</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">飽和度 (S)：</div>
-        <div class="info-value"><span id="infoSat">85</span>%</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">亮度 (L)：</div>
-        <div class="info-value">50%</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">RGB：</div>
-        <div class="info-value"><span id="infoRGB">rgb(0, 255, 255)</span></div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">顏色名稱：</div>
-        <div class="info-value"><span id="colorName">青色</span></div>
-      </div>
-    </div>
-  </div>
+            <!-- 觸發採集 -->
+            <div id="trigger" class="tab-content active">
+                <div class="card-title" id="lbl_settings">⚙️ 系統設定</div>
+                
+                <div class="info-box" id="info_text">
+                    <strong>如何使用：</strong><br>
+                    1️⃣ 初始化麥克風<br>
+                    2️⃣ 設定錄音秒數<br>
+                    3️⃣ 點擊「開始採集」<br>
+                    4️⃣ 等待倒計時<br>
+                    5️⃣ 查看結果
+                </div>
 
-  <!-- 預設按鈕 -->
-  <div>
-    <div style="font-size: 13px; font-weight: 500; margin-bottom: 8px;">快速預設：</div>
-    <div class="preset-buttons">
-      <button class="preset-btn" onclick="setPreset(20)">超低頻<br>(20 Hz)</button>
-      <button class="preset-btn" onclick="setPreset(80)">男性深沈<br>(80 Hz)</button>
-      <button class="preset-btn" onclick="setPreset(250)">男性標準<br>(250 Hz)</button>
-      <button class="preset-btn" onclick="setPreset(600)">標準語音<br>(600 Hz)</button>
-      <button class="preset-btn" onclick="setPreset(1200)">女性語音<br>(1.2k Hz)</button>
-      <button class="preset-btn" onclick="setPreset(2500)">兒童<br>(2.5k Hz)</button>
-      <button class="preset-btn" onclick="setPreset(8000)">高頻<br>(8k Hz)</button>
-      <button class="preset-btn" onclick="setPreset(20000)">超高頻<br>(20k Hz)</button>
+                <div class="control-item">
+                    <div class="control-label">
+                        <span id="lbl_duration">錄音秒數</span>
+                        <span class="control-value" id="durationDisplay">3.0</span>
+                    </div>
+                    <input type="range" id="durationSlider" min="1" max="10" value="3" step="0.5">
+                    <div class="control-desc" id="lbl_duration_desc">1 ~ 10 秒</div>
+                </div>
+
+                <div class="control-item">
+                    <div class="control-label">
+                        <span id="lbl_mic_status">麥克風狀態</span>
+                        <span class="control-value" id="micStatus">未初始化</span>
+                    </div>
+                    <button class="button" id="initMicButton" onclick="initMicrophone()">🎤 初始化麥克風</button>
+                </div>
+
+                <div id="errorBox" class="error-box"></div>
+                <div class="timer" id="timer">3.0</div>
+
+                <button class="button primary" id="startButton" onclick="startRecording()" disabled>🔴 開始採集</button>
+                <button class="button" id="resetButton" onclick="reset()">⟲ 重置</button>
+            </div>
+
+            <!-- 手動調整 -->
+            <div id="manual" class="tab-content">
+                <div class="card-title" id="lbl_manual">⚙️ 手動調整參數</div>
+
+                <div class="control-item">
+                    <div class="control-label">
+                        <span id="lbl_amp">① 振幅 (dBFS)</span>
+                        <span class="control-value" id="ampValue">-18</span>
+                    </div>
+                    <input type="range" id="ampSlider" min="-40" max="-3" value="-18" step="1" oninput="updateManual()">
+                    <div class="control-desc" id="lbl_amp_desc">球的大小</div>
+                </div>
+
+                <div class="control-item">
+                    <div class="control-label">
+                        <span id="lbl_ss">② 頻譜展度 (Hz)</span>
+                        <span class="control-value" id="ssValue">2000</span>
+                    </div>
+                    <input type="range" id="ssSlider" min="0" max="7920" value="2000" step="100" oninput="updateManual()">
+                    <div class="control-desc" id="lbl_ss_desc">發光亮度</div>
+                </div>
+
+                <div class="control-item">
+                    <div class="control-label">
+                        <span id="lbl_sc">③ 頻譜質心 (Hz)</span>
+                        <span class="control-value" id="scValue">1000</span>
+                    </div>
+                    <input type="range" id="scSlider" min="20" max="20000" value="1000" step="50" oninput="updateManual()">
+                    <div class="control-desc" id="lbl_sc_desc">球的顏色</div>
+                </div>
+
+                <div class="control-item">
+                    <div class="control-label">
+                        <span id="lbl_sf">④ 頻譜變化 (0-1)</span>
+                        <span class="control-value" id="sfValue">0.35</span>
+                    </div>
+                    <input type="range" id="sfSlider" min="0" max="1" value="0.35" step="0.01" oninput="updateManual()">
+                    <div class="control-desc" id="lbl_sf_desc">表面紋理</div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- 頻率色彩快速參考 -->
-  <div>
-    <div style="font-size: 14px; font-weight: 500; margin-bottom: 1rem;">頻率色彩映射表：</div>
-    <table class="comparison-table">
-      <tr style="border-bottom: 1px solid var(--color-border-secondary);">
-        <td style="font-weight: 500;">頻率範圍</td>
-        <td style="font-weight: 500;">色調</td>
-        <td style="font-weight: 500;">樣本</td>
-        <td style="font-weight: 500;">常見聲音</td>
-      </tr>
-      <tr>
-        <td>20-50 Hz</td>
-        <td>0° (紅)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(0, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>超低音</td>
-      </tr>
-      <tr>
-        <td>50-100 Hz</td>
-        <td>15° (紅)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(15, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>低音提琴</td>
-      </tr>
-      <tr>
-        <td>100-200 Hz</td>
-        <td>30° (橙)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(30, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>男性低音</td>
-      </tr>
-      <tr>
-        <td>200-350 Hz</td>
-        <td>45° (橙)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(45, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>男性中低音</td>
-      </tr>
-      <tr>
-        <td>350-550 Hz</td>
-        <td>60° (黃)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(60, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>男性標準語音</td>
-      </tr>
-      <tr>
-        <td>550-1000 Hz</td>
-        <td>90° (黃綠)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(90, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>標準語音</td>
-      </tr>
-      <tr>
-        <td>1000-2000 Hz</td>
-        <td>120° (綠)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(120, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>女性語音</td>
-      </tr>
-      <tr>
-        <td>2000-4000 Hz</td>
-        <td>150° (春綠)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(150, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>兒童語音</td>
-      </tr>
-      <tr>
-        <td>4000-7000 Hz</td>
-        <td>180° (青)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(180, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>尖銳聲、蛇聲</td>
-      </tr>
-      <tr>
-        <td>7000-10000 Hz</td>
-        <td>210° (青藍)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(210, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>高頻細節</td>
-      </tr>
-      <tr>
-        <td>10000-15000 Hz</td>
-        <td>240° (藍)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(240, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>極高頻</td>
-      </tr>
-      <tr>
-        <td>15000-20000 Hz</td>
-        <td>270° (靛紫)</td>
-        <td><div style="width: 20px; height: 20px; background: hsl(270, 85%, 50%); border-radius: 3px;"></div></td>
-        <td>超高頻尖刺</td>
-      </tr>
-    </table>
-  </div>
+    <!-- 結果區 -->
+    <div class="card" id="resultsCard" style="display: none; margin-top: 1.5rem;">
+        <div class="card-title" id="lbl_results">📊 分析結果</div>
+        <div class="results-grid">
+            <div class="result-item">
+                <div class="result-label" id="lbl_result_size">🔊 球的大小</div>
+                <div class="result-value" id="resultRadius">1.3 RU</div>
+                <div class="result-desc" id="lbl_result_amp">振幅: <span id="resultAmp">-18.0</span> dBFS</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label" id="lbl_result_glow">✨ 發光亮度</div>
+                <div class="result-value" id="resultGlow">0.50</div>
+                <div class="result-desc" id="lbl_result_ss">頻譜展度: <span id="resultSS">2000</span> Hz</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label" id="lbl_result_color">🌈 球的顏色</div>
+                <div class="result-value" id="resultHue">180° (青)</div>
+                <div class="result-desc" id="lbl_result_sc">頻率: <span id="resultSC">1000</span> Hz</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label" id="lbl_result_texture">🌊 表面紋理</div>
+                <div class="result-value" id="resultRough">0.35</div>
+                <div class="result-desc" id="lbl_result_sf">頻譜變化: <span id="resultSF">0.35</span></div>
+            </div>
+        </div>
 
-  <!-- 計算公式 -->
-  <div>
-    <div style="font-size: 14px; font-weight: 500; margin: 2rem 0 1rem 0;">轉換公式：</div>
-    <div class="formula-section">
-      <div style="margin-bottom: 8px;"><strong>對數頻率映射 (20Hz → 0°, 20kHz → 270°)</strong></div>
-      <div class="formula-line">log_freq = log₂(SC / 20) = log₂(<span id="formula1">50</span>) ≈ <span id="formula2">5.64</span></div>
-      <div class="formula-line">log_max = log₂(20000 / 20) = log₂(1000) ≈ 9.97</div>
-      <div class="formula-line">normalized = log_freq / log_max = <span id="formula3">0.565</span></div>
-      <div class="formula-line">hue = normalized × 270° = <span id="formula4">152°</span></div>
-      <div style="margin-top: 12px;"><strong>轉換為RGB</strong></div>
-      <div class="formula-line">HSL(<span id="formula5">152</span>°, <span id="formula6">85</span>%, 50%) = <span id="formula7">rgb(0, 255, 140)</span></div>
+        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+            <div style="font-size: 12px; font-weight: 600; margin-bottom: 0.5rem;" id="lbl_export">📤 導出數據</div>
+            <button class="button" id="exportJsonBtn" onclick="exportJSON()">📋 複製 JSON</button>
+            <button class="button" id="exportTDBtn" onclick="exportTouchDesigner()">🎛️ TouchDesigner 代碼</button>
+            <div class="export-code" id="exportCode"></div>
+        </div>
     </div>
-  </div>
-
-  <!-- 視覺參考網格 -->
-  <div>
-    <div style="font-size: 14px; font-weight: 500; margin-bottom: 1rem;">頻率-色彩網格參考：</div>
-    <div class="frequency-scale" id="freqScale"></div>
-  </div>
 </div>
 
 <script>
-const scSlider = document.getElementById('scSlider');
-const satSlider = document.getElementById('satSlider');
-const sphere = document.getElementById('sphereColor');
+// ===== 多語言 =====
+const i18n = {
+    zh: {
+        title: '🎤 音聲光球採集系統',
+        subtitle: '觸發式錄音 → 固定時間偵測 → 分析生成光球數據',
+        preview: '💡 光球預覽',
+        size: '球的大小',
+        glow: '發光亮度',
+        color: '球的顏色',
+        texture: '表面紋理',
+        trigger: '📍 觸發採集',
+        manual: '⚙️ 手動調整',
+        settings: '⚙️ 系統設定',
+        info: '<strong>如何使用：</strong><br>1️⃣ 初始化麥克風<br>2️⃣ 設定錄音秒數<br>3️⃣ 點擊「開始採集」<br>4️⃣ 等待倒計時<br>5️⃣ 查看結果',
+        duration: '錄音秒數',
+        duration_desc: '1 ~ 10 秒',
+        mic_status: '麥克風狀態',
+        not_init: '未初始化',
+        init_mic: '🎤 初始化麥克風',
+        start: '🔴 開始採集',
+        reset: '⟲ 重置',
+        manual_title: '⚙️ 手動調整參數',
+        amp: '① 振幅 (dBFS)',
+        amp_desc: '球的大小',
+        ss: '② 頻譜展度 (Hz)',
+        ss_desc: '發光亮度',
+        sc: '③ 頻譜質心 (Hz)',
+        sc_desc: '球的顏色',
+        sf: '④ 頻譜變化 (0-1)',
+        sf_desc: '表面紋理',
+        results: '📊 分析結果',
+        result_size: '🔊 球的大小',
+        result_amp: '振幅: {0} dBFS',
+        result_glow: '✨ 發光亮度',
+        result_ss: '頻譜展度: {0} Hz',
+        result_color: '🌈 球的顏色',
+        result_sc: '頻率: {0} Hz',
+        result_texture: '🌊 表面紋理',
+        result_sf: '頻譜變化: {0}',
+        export: '📤 導出數據',
+        copy_json: '📋 複製 JSON',
+        copy_td: '🎛️ TouchDesigner 代碼'
+    },
+    en: {
+        title: '🎤 Audio Sphere Collection System',
+        subtitle: 'Trigger recording → Fixed time detection → Analyze and generate sphere data',
+        preview: '💡 Sphere Preview',
+        size: 'Size',
+        glow: 'Glow',
+        color: 'Color',
+        texture: 'Texture',
+        trigger: '📍 Trigger',
+        manual: '⚙️ Manual',
+        settings: '⚙️ System Settings',
+        info: '<strong>How to use:</strong><br>1️⃣ Initialize microphone<br>2️⃣ Set duration<br>3️⃣ Click "Start Collection"<br>4️⃣ Wait for countdown<br>5️⃣ View results',
+        duration: 'Duration',
+        duration_desc: '1 ~ 10 seconds',
+        mic_status: 'Microphone Status',
+        not_init: 'Not initialized',
+        init_mic: '🎤 Initialize Mic',
+        start: '🔴 Start Collection',
+        reset: '⟲ Reset',
+        manual_title: '⚙️ Manual Parameters',
+        amp: '① Amplitude (dBFS)',
+        amp_desc: 'Size',
+        ss: '② Spectral Spread (Hz)',
+        ss_desc: 'Glow',
+        sc: '③ Spectral Centroid (Hz)',
+        sc_desc: 'Color',
+        sf: '④ Spectral Flux (0-1)',
+        sf_desc: 'Texture',
+        results: '📊 Analysis Results',
+        result_size: '🔊 Size',
+        result_amp: 'Amplitude: {0} dBFS',
+        result_glow: '✨ Glow',
+        result_ss: 'Spectral Spread: {0} Hz',
+        result_color: '🌈 Color',
+        result_sc: 'Frequency: {0} Hz',
+        result_texture: '🌊 Texture',
+        result_sf: 'Spectral Flux: {0}',
+        export: '📤 Export Data',
+        copy_json: '📋 Copy JSON',
+        copy_td: '🎛️ TouchDesigner Code'
+    },
+    ko: {
+        title: '🎤 음성 구 수집 시스템',
+        subtitle: '녹음 트리거 → 고정 시간 감지 → 구 데이터 분석 및 생성',
+        preview: '💡 구 미리보기',
+        size: '크기',
+        glow: '발광',
+        color: '색상',
+        texture: '질감',
+        trigger: '📍 트리거',
+        manual: '⚙️ 수동',
+        settings: '⚙️ 시스템 설정',
+        info: '<strong>사용 방법:</strong><br>1️⃣ 마이크 초기화<br>2️⃣ 녹음 시간 설정<br>3️⃣ "수집 시작" 클릭<br>4️⃣ 카운트다운 완료 기다리기<br>5️⃣ 결과 보기',
+        duration: '녹음 시간',
+        duration_desc: '1 ~ 10초',
+        mic_status: '마이크 상태',
+        not_init: '초기화되지 않음',
+        init_mic: '🎤 마이크 초기화',
+        start: '🔴 수집 시작',
+        reset: '⟲ 재설정',
+        manual_title: '⚙️ 수동 조정',
+        amp: '① 진폭 (dBFS)',
+        amp_desc: '크기',
+        ss: '② 스펙트럼 전개 (Hz)',
+        ss_desc: '발광',
+        sc: '③ 스펙트럼 중심 (Hz)',
+        sc_desc: '색상',
+        sf: '④ 스펙트럼 변화 (0-1)',
+        sf_desc: '질감',
+        results: '📊 분석 결과',
+        result_size: '🔊 크기',
+        result_amp: '진폭: {0} dBFS',
+        result_glow: '✨ 발광',
+        result_ss: '스펙트럼 전개: {0} Hz',
+        result_color: '🌈 색상',
+        result_sc: '주파수: {0} Hz',
+        result_texture: '🌊 질감',
+        result_sf: '스펙트럼 변화: {0}',
+        export: '📤 데이터 내보내기',
+        copy_json: '📋 JSON 복사',
+        copy_td: '🎛️ TouchDesigner 코드'
+    }
+};
 
-// 精準的12段色調定義
-const colorSegments = [
-  { freq_min: 20, freq_max: 50, name: '超低紅', hue: 0 },
-  { freq_min: 50, freq_max: 100, name: '深紅', hue: 15 },
-  { freq_min: 100, freq_max: 200, name: '紅', hue: 30 },
-  { freq_min: 200, freq_max: 350, name: '橙紅', hue: 45 },
-  { freq_min: 350, freq_max: 550, name: '橙黃', hue: 60 },
-  { freq_min: 550, freq_max: 1000, name: '黃綠', hue: 90 },
-  { freq_min: 1000, freq_max: 2000, name: '綠', hue: 120 },
-  { freq_min: 2000, freq_max: 4000, name: '春綠', hue: 150 },
-  { freq_min: 4000, freq_max: 7000, name: '青', hue: 180 },
-  { freq_min: 7000, freq_max: 10000, name: '青藍', hue: 210 },
-  { freq_min: 10000, freq_max: 15000, name: '藍', hue: 240 },
-  { freq_min: 15000, freq_max: 20000, name: '靛紫', hue: 270 }
-];
+let currentLang = 'zh';
+let audioContext;
+let mediaStream;
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+let recordingDuration = 3;
 
-function hslToRgb(h, s, l) {
-  s /= 100; l /= 100;
-  const c = (1 - Math.abs(2 * l - 1)) * s;
-  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-  const m = l - c / 2;
-  let r, g, b;
-
-  if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
-  else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
-  else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
-  else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
-  else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
-  else { r = c; g = 0; b = x; }
-
-  r = Math.round((r + m) * 255);
-  g = Math.round((g + m) * 255);
-  b = Math.round((b + m) * 255);
-
-  return [r, g, b];
-}
-
-function rgbToString(rgb) {
-  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-}
-
-function frequencyToHue(freq) {
-  // 對數映射：20Hz → 0°, 20kHz → 270°
-  const logFreq = Math.log2(Math.max(freq, 20) / 20);
-  const logMax = Math.log2(20000 / 20);  // ≈ 9.97
-  const normalized = Math.max(0, Math.min(1, logFreq / logMax));
-  return normalized * 270;  // 只用0-270°，不是0-360°
-}
-
-function updateDisplay() {
-  const sc = parseFloat(scSlider.value);
-  const sat = parseFloat(satSlider.value);
-  const light = 50;
-  const hue = frequencyToHue(sc);
-
-  // 更新輸入顯示
-  document.getElementById('scValue').textContent = Math.round(sc);
-  document.getElementById('satValue').textContent = sat;
-
-  // 找到顏色段
-  const colorInfo = colorSegments.find(seg => sc >= seg.freq_min && sc < seg.freq_max) || colorSegments[11];
-
-  // 計算RGB
-  const rgb = hslToRgb(hue, sat, light);
-  const rgbStr = rgbToString(rgb);
-
-  // 更新光球
-  sphere.style.backgroundColor = `hsl(${hue}, ${sat}%, ${light}%)`;
-  sphere.style.boxShadow = `0 0 0 1px var(--color-border-tertiary), 0 8px 24px ${rgbStr}40`;
-
-  // 更新信息面板
-  document.getElementById('infoFreq').textContent = Math.round(sc);
-  document.getElementById('infoHue').textContent = Math.round(hue);
-  document.getElementById('infoSat').textContent = sat;
-  document.getElementById('infoRGB').textContent = rgbStr;
-  document.getElementById('colorName').textContent = colorInfo.name;
-
-  // 更新公式
-  const logFreq = Math.log2(Math.max(sc, 20) / 20);
-  const logMax = Math.log2(20000 / 20);
-  const normalized = Math.max(0, Math.min(1, logFreq / logMax));
-  document.getElementById('formula1').textContent = (Math.max(sc, 20) / 20).toFixed(1);
-  document.getElementById('formula2').textContent = logFreq.toFixed(2);
-  document.getElementById('formula3').textContent = normalized.toFixed(3);
-  document.getElementById('formula4').textContent = Math.round(hue);
-  document.getElementById('formula5').textContent = Math.round(hue);
-  document.getElementById('formula6').textContent = sat;
-  document.getElementById('formula7').textContent = rgbStr;
-
-  // 更新色譜條
-  const spectrumBar = document.getElementById('spectrumBar');
-  spectrumBar.style.background = `linear-gradient(to right, 
-    hsl(0, 85%, 50%) 0%, 
-    hsl(15, 85%, 50%) 8.3%,
-    hsl(30, 85%, 50%) 16.7%,
-    hsl(45, 85%, 50%) 25%,
-    hsl(60, 85%, 50%) 33.3%,
-    hsl(90, 85%, 50%) 41.7%,
-    hsl(120, 85%, 50%) 50%,
-    hsl(150, 85%, 50%) 58.3%,
-    hsl(180, 85%, 50%) 66.7%,
-    hsl(210, 85%, 50%) 75%,
-    hsl(240, 85%, 50%) 83.3%,
-    hsl(270, 85%, 50%) 100%)`;
-  
-  // 計算當前位置指示
-  const posPercent = (normalized * 100);
-  document.getElementById('spectrumIndicator').style.left = posPercent + '%';
-}
-
-// 初始化頻率網格
-function initFreqScale() {
-  const container = document.getElementById('freqScale');
-  container.innerHTML = '';
-  const freqs = [20, 100, 500, 1000, 2500, 5000, 10000, 20000];
-  
-  freqs.forEach(freq => {
-    const hue = frequencyToHue(freq);
-    const box = document.createElement('div');
-    box.className = 'freq-box';
-    box.style.cursor = 'pointer';
-    box.style.transition = 'all 0.2s';
-    box.onclick = () => {
-      scSlider.value = freq;
-      updateDisplay();
+// ===== 語言切換 =====
+function changeLang(lang) {
+    currentLang = lang;
+    
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const labels = {
+        title: i18n[lang].title,
+        subtitle: i18n[lang].subtitle,
+        lbl_preview: i18n[lang].preview,
+        lbl_size: i18n[lang].size,
+        lbl_glow: i18n[lang].glow,
+        lbl_color: i18n[lang].color,
+        lbl_texture: i18n[lang].texture,
+        tab_trigger: i18n[lang].trigger,
+        tab_manual: i18n[lang].manual,
+        lbl_settings: i18n[lang].settings,
+        info_text: i18n[lang].info,
+        lbl_duration: i18n[lang].duration,
+        lbl_duration_desc: i18n[lang].duration_desc,
+        lbl_mic_status: i18n[lang].mic_status,
+        micStatus: i18n[lang].not_init,
+        initMicButton: i18n[lang].init_mic,
+        startButton: i18n[lang].start,
+        resetButton: i18n[lang].reset,
+        lbl_manual: i18n[lang].manual_title,
+        lbl_amp: i18n[lang].amp,
+        lbl_amp_desc: i18n[lang].amp_desc,
+        lbl_ss: i18n[lang].ss,
+        lbl_ss_desc: i18n[lang].ss_desc,
+        lbl_sc: i18n[lang].sc,
+        lbl_sc_desc: i18n[lang].sc_desc,
+        lbl_sf: i18n[lang].sf,
+        lbl_sf_desc: i18n[lang].sf_desc,
+        lbl_results: i18n[lang].results,
+        lbl_result_size: i18n[lang].result_size,
+        lbl_result_glow: i18n[lang].result_glow,
+        lbl_result_color: i18n[lang].result_color,
+        lbl_result_texture: i18n[lang].result_texture,
+        lbl_export: i18n[lang].export,
+        exportJsonBtn: i18n[lang].copy_json,
+        exportTDBtn: i18n[lang].copy_td
     };
     
-    const colorInfo = colorSegments.find(seg => freq >= seg.freq_min && freq < seg.freq_max);
-    
-    box.innerHTML = `
-      <div class="freq-hz">${freq > 1000 ? (freq/1000).toFixed(1) + 'k' : freq} Hz</div>
-      <div class="freq-color" style="background: hsl(${hue}, 85%, 50%);"></div>
-      <div class="freq-name">${colorInfo ? colorInfo.name : '紫'}</div>
-    `;
-    box.onmouseenter = () => box.style.transform = 'scale(1.05)';
-    box.onmouseleave = () => box.style.transform = 'scale(1)';
-    
-    container.appendChild(box);
-  });
+    Object.keys(labels).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (id === 'info_text') {
+                el.innerHTML = labels[id];
+            } else if (id === 'title') {
+                el.textContent = labels[id];
+            } else if (id === 'subtitle') {
+                el.textContent = labels[id];
+            } else {
+                el.textContent = labels[id];
+            }
+        }
+    });
 }
 
-function setPreset(freq) {
-  scSlider.value = freq;
-  updateDisplay();
-  
-  // 更新預設按鈕視覺反饋
-  document.querySelectorAll('.preset-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.textContent.includes(freq > 1000 ? (freq/1000).toFixed(0) : freq)) {
-      btn.classList.add('active');
+// ===== 標籤切換 =====
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+}
+
+// ===== 麥克風 =====
+async function initMicrophone() {
+    try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        mediaRecorder = new MediaRecorder(mediaStream);
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+        mediaRecorder.onstop = processAudio;
+
+        document.getElementById('micStatus').textContent = '✓ ' + (currentLang === 'zh' ? '已連接' : currentLang === 'en' ? 'Connected' : '연결됨');
+        document.getElementById('micStatus').style.color = '#00aa00';
+        document.getElementById('initMicButton').disabled = true;
+        document.getElementById('startButton').disabled = false;
+    } catch (error) {
+        document.getElementById('errorBox').style.display = 'block';
+        document.getElementById('errorBox').textContent = '❌ ' + error.message;
     }
-  });
 }
 
-scSlider.addEventListener('input', updateDisplay);
-satSlider.addEventListener('input', updateDisplay);
+// ===== 錄音 =====
+function startRecording() {
+    if (!mediaRecorder || isRecording) return;
 
-initFreqScale();
-updateDisplay();
+    audioChunks = [];
+    isRecording = true;
+    
+    document.getElementById('startButton').disabled = true;
+    document.getElementById('durationSlider').disabled = true;
+
+    mediaRecorder.start();
+
+    let timeLeft = recordingDuration;
+    const timer = document.getElementById('timer');
+    timer.style.display = 'flex';
+    timer.textContent = timeLeft.toFixed(1);
+
+    const interval = setInterval(() => {
+        timeLeft -= 0.1;
+        timer.textContent = Math.max(0, timeLeft).toFixed(1);
+
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            mediaRecorder.stop();
+            isRecording = false;
+            timer.style.display = 'none';
+        }
+    }, 100);
+}
+
+// ===== 處理音頻 =====
+async function processAudio() {
+    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+    const arrayBuffer = await audioBlob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    const params = analyzeAudio(audioBuffer);
+    displayResults(params);
+    
+    document.getElementById('startButton').disabled = false;
+    document.getElementById('durationSlider').disabled = false;
+}
+
+// ===== 分析 =====
+function analyzeAudio(audioBuffer) {
+    const rawData = audioBuffer.getChannelData(0);
+    const rms = Math.sqrt(rawData.reduce((a, b) => a + b * b, 0) / rawData.length);
+    const amplitude = Math.max(-40, Math.min(-3, 20 * Math.log10(rms)));
+
+    const offlineContext = new OfflineAudioContext(1, audioBuffer.length, audioBuffer.sampleRate);
+    const source = offlineContext.createBufferSource();
+    source.buffer = audioBuffer;
+    const analyser = offlineContext.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+    analyser.connect(offlineContext.destination);
+    source.start(0);
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(dataArray);
+
+    const totalEnergy = dataArray.reduce((a, b) => a + b);
+    let weightedFreq = 0;
+
+    for (let i = 0; i < dataArray.length; i++) {
+        const freq = (i * audioBuffer.sampleRate) / analyser.fftSize;
+        weightedFreq += freq * dataArray[i];
+    }
+
+    const spectralCentroid = totalEnergy > 0 ? weightedFreq / totalEnergy : 1000;
+
+    let variance = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+        const freq = (i * audioBuffer.sampleRate) / analyser.fftSize;
+        variance += ((freq - spectralCentroid) ** 2) * dataArray[i];
+    }
+    const spectralSpread = Math.sqrt(variance / (totalEnergy || 1));
+
+    const highFreq = dataArray.slice(dataArray.length / 2).reduce((a, b) => a + b);
+    const lowFreq = dataArray.slice(0, dataArray.length / 2).reduce((a, b) => a + b);
+    const spectralFlux = Math.min(1, Math.abs(highFreq - lowFreq) / (highFreq + lowFreq + 1));
+
+    return {
+        amplitude: Math.round(amplitude * 10) / 10,
+        spectralCentroid: Math.round(spectralCentroid),
+        spectralSpread: Math.round(spectralSpread),
+        spectralFlux: Math.round(spectralFlux * 100) / 100
+    };
+}
+
+// ===== 球體屬性 =====
+function calculateSphereProps(params) {
+    const normAmp = (params.amplitude + 40) / 37;
+    const radius = 0.2 + normAmp * 1.8;
+    const normSS = params.spectralSpread / 7920;
+    const glow = 0.1 + normSS * 0.8;
+    const logFreq = Math.log2(Math.max(params.spectralCentroid, 20) / 20);
+    const normFreq = Math.max(0, Math.min(1, logFreq / 9.97));
+    const hue = normFreq * 270;
+    const roughness = params.spectralFlux;
+
+    return { radius, glow, hue, roughness };
+}
+
+function getColorName(hue) {
+    const colors = {
+        zh: ['紅', '橙', '黃', '黃綠', '綠', '春綠', '青', '青藍', '藍', '靛紫'],
+        en: ['Red', 'Orange', 'Yellow', 'Yellow-Green', 'Green', 'Spring Green', 'Cyan', 'Cyan-Blue', 'Blue', 'Indigo'],
+        ko: ['빨강', '주황', '노랑', '노랑-녹색', '녹색', '봄 녹색', '청록', '청록-파랑', '파랑', '남색']
+    };
+    const arr = colors[currentLang] || colors['zh'];
+    const idx = Math.min(Math.floor(hue / 30), arr.length - 1);
+    return arr[idx];
+}
+
+function updateSphereDisplay(params) {
+    const props = calculateSphereProps(params);
+    const sphere = document.getElementById('sphere');
+    const size = 80 + props.radius * 40;
+    
+    sphere.style.width = size + 'px';
+    sphere.style.height = size + 'px';
+    sphere.style.background = `hsl(${props.hue}, 85%, 50%)`;
+    sphere.style.boxShadow = `0 0 0 1px var(--border), 0 8px 24px hsla(${props.hue}, 85%, 50%, ${props.glow * 0.5})`;
+    sphere.style.filter = `blur(${props.roughness * 2}px)`;
+
+    document.getElementById('displayRadius').textContent = props.radius.toFixed(2) + ' RU';
+    document.getElementById('displayGlow').textContent = props.glow.toFixed(2);
+    document.getElementById('displayHue').textContent = Math.round(props.hue) + '° (' + getColorName(props.hue) + ')';
+    document.getElementById('displayRough').textContent = props.roughness.toFixed(2);
+
+    window.lastProps = props;
+}
+
+function updateManual() {
+    const params = {
+        amplitude: parseFloat(document.getElementById('ampSlider').value),
+        spectralCentroid: parseFloat(document.getElementById('scSlider').value),
+        spectralSpread: parseFloat(document.getElementById('ssSlider').value),
+        spectralFlux: parseFloat(document.getElementById('sfSlider').value)
+    };
+
+    document.getElementById('ampValue').textContent = params.amplitude;
+    document.getElementById('scValue').textContent = Math.round(params.spectralCentroid);
+    document.getElementById('ssValue').textContent = Math.round(params.spectralSpread);
+    document.getElementById('sfValue').textContent = params.spectralFlux.toFixed(2);
+
+    updateSphereDisplay(params);
+}
+
+function displayResults(params) {
+    document.getElementById('resultAmp').textContent = params.amplitude + ' dBFS';
+    document.getElementById('resultSC').textContent = params.spectralCentroid + ' Hz';
+    document.getElementById('resultSS').textContent = params.spectralSpread + ' Hz';
+    document.getElementById('resultSF').textContent = params.spectralFlux;
+
+    const props = calculateSphereProps(params);
+    document.getElementById('resultRadius').textContent = props.radius.toFixed(2) + ' RU';
+    document.getElementById('resultGlow').textContent = props.glow.toFixed(2);
+    document.getElementById('resultHue').textContent = Math.round(props.hue) + '° (' + getColorName(props.hue) + ')';
+    document.getElementById('resultRough').textContent = props.roughness.toFixed(2);
+
+    updateSphereDisplay(params);
+    document.getElementById('resultsCard').style.display = 'block';
+    window.lastParams = params;
+}
+
+// ===== 導出 =====
+function exportJSON() {
+    if (!window.lastParams) return;
+    const data = {
+        audioParams: window.lastParams,
+        sphereProperties: window.lastProps
+    };
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+}
+
+function exportTouchDesigner() {
+    if (!window.lastParams) return;
+    const p = window.lastParams;
+    const code = `# TouchDesigner Python
+amplitude = ${p.amplitude}
+spectralCentroid = ${p.spectralCentroid}
+spectralSpread = ${p.spectralSpread}
+spectralFlux = ${p.spectralFlux}
+
+normalized_amp = (amplitude + 40) / 37
+sphere_radius = 0.2 + normalized_amp * 1.8
+normalized_ss = spectralSpread / 7920
+sphere_glow = 0.1 + normalized_ss * 0.8
+
+import math
+log_freq = math.log2(max(spectralCentroid, 20) / 20)
+normalized_freq = max(0, min(1, log_freq / 9.97))
+sphere_hue = normalized_freq * 270
+sphere_roughness = spectralFlux`;
+    navigator.clipboard.writeText(code);
+    document.getElementById('exportCode').textContent = code;
+    document.getElementById('exportCode').style.display = 'block';
+}
+
+// ===== 重置 =====
+function reset() {
+    document.getElementById('resultsCard').style.display = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+    updateManual();
+}
+
+// 初始化
+document.getElementById('durationSlider').addEventListener('input', (e) => {
+    recordingDuration = parseFloat(e.target.value);
+    document.getElementById('durationDisplay').textContent = recordingDuration.toFixed(1);
+});
+
+updateManual();
 </script>
+
 </body>
 </html>
