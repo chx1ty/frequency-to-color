@@ -310,6 +310,314 @@
             display: none;
         }
 
+        /* 即時監測 */
+        .live-monitor {
+            display: none;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 0.8rem;
+        }
+        .live-monitor.active { display: block; }
+        .live-monitor .lm-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .live-monitor .lm-rec-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff3333;
+            animation: blink 1s ease infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.3 } }
+        .lm-canvas {
+            display: block;
+            width: 100%;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+        #waveCanvas { height: 70px; }
+        #specCanvas { height: 100px; }
+        .lm-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .lm-cell {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+        .lm-cell .lm-label {
+            font-size: 9px;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .lm-cell .lm-val {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 3px;
+            font-family: monospace;
+        }
+        .lm-cell .lm-unit {
+            font-size: 9px;
+            color: var(--text-secondary);
+            margin-left: 2px;
+        }
+        .lm-cell .lm-bar {
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .lm-cell .lm-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.05s linear;
+        }
+        .lm-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+        .lm-preview-sphere {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: hsl(180, 85%, 50%);
+            box-shadow: 0 0 16px hsla(180, 85%, 50%, 0.6);
+            transition: all 0.05s linear;
+        }
+        .lm-preview-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+        .lm-preview-text b {
+            color: var(--accent);
+            font-size: 13px;
+        }
+
+        /* 映射設定 */
+        .map-section {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .map-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .map-section-title small {
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 10px;
+        }
+        .map-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .map-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .map-field label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+        .map-field input[type="number"] {
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            width: 100%;
+        }
+        .map-field input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .map-field select.map-select {
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 12px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            width: 100%;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .map-field select.map-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .synth-divider {
+            margin: 1.2rem 0 0.6rem;
+            padding-top: 0.8rem;
+            border-top: 1px dashed var(--border);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+        }
+        .map-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+        .map-preview-bar {
+            height: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            border: 1px solid var(--border);
+            background: linear-gradient(to right, hsl(0,85%,50%), hsl(270,85%,50%));
+        }
+        .map-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .map-actions .button { margin-bottom: 0; }
+        .map-save-hint {
+            font-size: 10px;
+            color: #00aa00;
+            text-align: center;
+            margin-top: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .map-save-hint.show { opacity: 1; }
+
+        /* 旋律 */
+        .melody-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+        .melody-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .melody-header .card-title { margin-bottom: 0; }
+        .melody-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        .melody-info b {
+            color: var(--accent);
+            font-weight: 700;
+            margin-left: 2px;
+        }
+        .melody-notes {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 90px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+        .melody-note {
+            flex: 1;
+            background: var(--accent);
+            border-radius: 2px 2px 0 0;
+            opacity: 0.45;
+            transition: opacity 0.1s, transform 0.1s;
+            min-height: 4px;
+            position: relative;
+        }
+        .melody-note.active {
+            opacity: 1;
+            box-shadow: 0 0 12px var(--accent), 0 0 4px var(--accent);
+            transform: scaleY(1.05);
+        }
+        .melody-note.rest {
+            background: var(--border);
+            opacity: 0.3;
+            min-height: 2px;
+        }
+        .melody-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .melody-controls .button { margin-bottom: 0; flex: 1; }
+        .melody-sliders {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .melody-tempo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            flex: 1;
+            min-width: 180px;
+        }
+        .melody-tempo input[type="range"] {
+            flex: 1;
+            min-width: 80px;
+        }
+        .melody-tempo .slider-val {
+            font-family: monospace;
+            color: var(--accent);
+            min-width: 30px;
+            text-align: right;
+            font-weight: 600;
+        }
+
         @media (max-width: 1024px) {
             .main-grid {
                 grid-template-columns: 1fr;
@@ -366,6 +674,7 @@
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('trigger')" id="tab_trigger">📍 觸發採集</button>
                 <button class="tab-btn" onclick="switchTab('manual')" id="tab_manual">⚙️ 手動調整</button>
+                <button class="tab-btn" onclick="switchTab('mapping')" id="tab_mapping">🎛️ 映射設定</button>
             </div>
 
             <!-- 觸發採集 -->
@@ -401,8 +710,251 @@
                 <div id="errorBox" class="error-box"></div>
                 <div class="timer" id="timer">3.0</div>
 
+                <div class="live-monitor" id="liveMonitor">
+                    <div class="lm-title">
+                        <span><span class="lm-rec-dot"></span> <span id="lm_title">即時監測 LIVE</span></span>
+                        <span id="lm_elapsed" style="font-family:monospace;color:var(--text-secondary);">0.0s</span>
+                    </div>
+                    <canvas class="lm-canvas" id="waveCanvas" width="600" height="140"></canvas>
+                    <canvas class="lm-canvas" id="specCanvas" width="600" height="200"></canvas>
+                    <div class="lm-grid">
+                        <div class="lm-cell">
+                            <div class="lm-label" id="lm_lbl_amp">① AMP</div>
+                            <div class="lm-val"><span id="liveAmp">-∞</span><span class="lm-unit">dBFS</span></div>
+                            <div class="lm-bar"><div class="lm-bar-fill" id="liveAmpBar"></div></div>
+                        </div>
+                        <div class="lm-cell">
+                            <div class="lm-label" id="lm_lbl_sc">③ CENTROID</div>
+                            <div class="lm-val"><span id="liveSC">0</span><span class="lm-unit">Hz</span></div>
+                            <div class="lm-bar"><div class="lm-bar-fill" id="liveSCBar"></div></div>
+                        </div>
+                        <div class="lm-cell">
+                            <div class="lm-label" id="lm_lbl_ss">② SPREAD</div>
+                            <div class="lm-val"><span id="liveSS">0</span><span class="lm-unit">Hz</span></div>
+                            <div class="lm-bar"><div class="lm-bar-fill" id="liveSSBar"></div></div>
+                        </div>
+                        <div class="lm-cell">
+                            <div class="lm-label" id="lm_lbl_sf">④ FLUX</div>
+                            <div class="lm-val"><span id="liveSF">0.00</span></div>
+                            <div class="lm-bar"><div class="lm-bar-fill" id="liveSFBar"></div></div>
+                        </div>
+                    </div>
+                    <div class="lm-preview">
+                        <div class="lm-preview-sphere" id="livePreviewSphere"></div>
+                        <div class="lm-preview-text">
+                            <span id="lm_lbl_preview">即時球體</span>
+                            <b id="liveHue">180°</b>
+                            R=<b id="liveR">1.00</b>
+                            G=<b id="liveG">0.50</b>
+                        </div>
+                    </div>
+                </div>
+
                 <button class="button primary" id="startButton" onclick="startRecording()" disabled>🔴 開始採集</button>
                 <button class="button" id="resetButton" onclick="reset()">⟲ 重置</button>
+            </div>
+
+            <!-- 映射設定 -->
+            <div id="mapping" class="tab-content">
+                <div class="card-title" id="lbl_map_title">🎛️ 映射範圍設定</div>
+                <div class="info-box" id="lbl_map_info">
+                    <strong>說明：</strong>調整 4 個分析參數的輸入偵測範圍與輸出對應，修改後即時生效並自動儲存。<br>
+                    可在「即時監測」觀察實際數值，再回此處對應調整。
+                </div>
+
+                <!-- ① 振幅 → 球體大小 -->
+                <div class="map-section">
+                    <div class="map-section-title">
+                        <span>① <span id="lbl_map_amp">振幅 → 球體大小</span></span>
+                        <small>RMS → Radius</small>
+                    </div>
+                    <div class="map-grid">
+                        <div class="map-field">
+                            <label id="lbl_in_min">輸入 Min (dBFS)</label>
+                            <input type="number" id="mapAmpInMin" step="1">
+                        </div>
+                        <div class="map-field">
+                            <label id="lbl_in_max">輸入 Max (dBFS)</label>
+                            <input type="number" id="mapAmpInMax" step="1">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Min (RU)</label>
+                            <input type="number" id="mapAmpOutMin" step="0.05">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Max (RU)</label>
+                            <input type="number" id="mapAmpOutMax" step="0.05">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ② 頻譜展度 → 發光 -->
+                <div class="map-section">
+                    <div class="map-section-title">
+                        <span>② <span id="lbl_map_ss">頻譜展度 → 發光亮度</span></span>
+                        <small>Spread → Glow</small>
+                    </div>
+                    <div class="map-grid">
+                        <div class="map-field">
+                            <label>輸入 Min (Hz)</label>
+                            <input type="number" id="mapSSInMin" step="50">
+                        </div>
+                        <div class="map-field">
+                            <label>輸入 Max (Hz)</label>
+                            <input type="number" id="mapSSInMax" step="50">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Min</label>
+                            <input type="number" id="mapSSOutMin" step="0.05">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Max</label>
+                            <input type="number" id="mapSSOutMax" step="0.05">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ③ 頻譜質心 → 色相 -->
+                <div class="map-section">
+                    <div class="map-section-title">
+                        <span>③ <span id="lbl_map_sc">頻譜質心 → 色相</span></span>
+                        <small>Centroid → Hue</small>
+                    </div>
+                    <div class="map-grid">
+                        <div class="map-field">
+                            <label>輸入 Min (Hz)</label>
+                            <input type="number" id="mapSCInMin" step="10">
+                        </div>
+                        <div class="map-field">
+                            <label>輸入 Max (Hz)</label>
+                            <input type="number" id="mapSCInMax" step="10">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Min (°)</label>
+                            <input type="number" id="mapSCOutMin" step="10">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Max (°)</label>
+                            <input type="number" id="mapSCOutMax" step="10">
+                        </div>
+                    </div>
+                    <label class="map-toggle">
+                        <input type="checkbox" id="mapSCLog">
+                        <span id="lbl_map_log">使用對數刻度（適合頻率）</span>
+                    </label>
+                    <div class="map-preview-bar" id="mapHuePreview"></div>
+                </div>
+
+                <!-- ④ 頻譜變化 → 紋理 -->
+                <div class="map-section">
+                    <div class="map-section-title">
+                        <span>④ <span id="lbl_map_sf">頻譜變化 → 表面紋理</span></span>
+                        <small>Flux → Roughness</small>
+                    </div>
+                    <div class="map-grid">
+                        <div class="map-field">
+                            <label>輸入 Min</label>
+                            <input type="number" id="mapSFInMin" step="0.05">
+                        </div>
+                        <div class="map-field">
+                            <label>輸入 Max</label>
+                            <input type="number" id="mapSFInMax" step="0.05">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Min</label>
+                            <input type="number" id="mapSFOutMin" step="0.05">
+                        </div>
+                        <div class="map-field">
+                            <label>輸出 Max</label>
+                            <input type="number" id="mapSFOutMax" step="0.05">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🎵 聲音合成設定 -->
+                <div class="synth-divider" id="lbl_synth_title">🎵 聲音合成設定</div>
+                <div class="info-box" id="lbl_synth_info">
+                    <strong>說明：</strong>決定旋律「聽起來像什麼」— 音階、波形、音域、速度與濾波範圍。修改即時生效並重新生成當前旋律。
+                </div>
+
+                <!-- 音階 + 音色 -->
+                <div class="map-section">
+                    <div class="map-section-title">
+                        <span id="lbl_synth_a">A. 音階 + 音色</span>
+                        <small>Scale &amp; Tone</small>
+                    </div>
+                    <div class="map-grid">
+                        <div class="map-field" style="grid-column: 1 / -1;">
+                            <label>音階 Scale</label>
+                            <select id="synthScale" class="map-select">
+                                <option value="pentatonic">Pentatonic 五聲音階（最和諧）</option>
+                                <option value="major">Major 大調（明亮）</option>
+                                <option value="minor">Natural Minor 小調（憂鬱）</option>
+                                <option value="lydian">Lydian 利底亞（夢幻）</option>
+                                <option value="wholeTone">Whole Tone 全音音階（懸浮）</option>
+                                <option value="chromatic">Chromatic 半音（無調性）</option>
+                            </select>
+                        </div>
+                        <div class="map-field" style="grid-column: 1 / -1;">
+                            <label>波形 Waveform</label>
+                            <select id="synthWaveform" class="map-select">
+                                <option value="auto">Auto（依 roughness 變化）</option>
+                                <option value="sine">Sine 純淨</option>
+                                <option value="triangle">Triangle 清脆</option>
+                                <option value="square">Square 顆粒</option>
+                                <option value="sawtooth">Sawtooth 刺耳</option>
+                            </select>
+                        </div>
+                        <div class="map-field">
+                            <label>根音 MIDI Base (48=C3, 60=C4)</label>
+                            <input type="number" id="synthBaseMidi" min="12" max="84" step="1">
+                        </div>
+                        <div class="map-field">
+                            <label>最低 Velocity (0~1)</label>
+                            <input type="number" id="synthMinVel" min="0" max="1" step="0.05">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 速度 + 濾波器 -->
+                <div class="map-section">
+                    <div class="map-section-title">
+                        <span id="lbl_synth_b">B. 速度 + 濾波器範圍</span>
+                        <small>Tempo &amp; Filter</small>
+                    </div>
+                    <div class="map-grid">
+                        <div class="map-field">
+                            <label>BPM Min (粗糙=0)</label>
+                            <input type="number" id="synthBpmMin" min="40" max="240" step="5">
+                        </div>
+                        <div class="map-field">
+                            <label>BPM Max (粗糙=1)</label>
+                            <input type="number" id="synthBpmMax" min="40" max="240" step="5">
+                        </div>
+                        <div class="map-field">
+                            <label>Cutoff Min Hz (亮度=0)</label>
+                            <input type="number" id="synthCutMin" min="100" max="20000" step="100">
+                        </div>
+                        <div class="map-field">
+                            <label>Cutoff Max Hz (亮度=1)</label>
+                            <input type="number" id="synthCutMax" min="100" max="20000" step="100">
+                        </div>
+                        <div class="map-field">
+                            <label>濾波器 Q 共振 (0.1~20)</label>
+                            <input type="number" id="synthFilterQ" min="0.1" max="20" step="0.1">
+                        </div>
+                        <div class="map-field">
+                            <label>靜音閾值 dBFS (裁邊)</label>
+                            <input type="number" id="synthSilenceDb" min="-60" max="-20" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="map-actions">
+                    <button class="button" onclick="resetMapping()" id="btn_reset_map">↺ 還原預設</button>
+                    <button class="button" onclick="exportMapping()" id="btn_export_map">📋 複製設定 JSON</button>
+                </div>
+                <div class="map-save-hint" id="mapSaveHint">✓ 已儲存</div>
             </div>
 
             <!-- 手動調整 -->
@@ -471,6 +1023,39 @@
                 <div class="result-label" id="lbl_result_texture">🌊 表面紋理</div>
                 <div class="result-value" id="resultRough">0.35</div>
                 <div class="result-desc" id="lbl_result_sf">頻譜變化: <span id="resultSF">0.35</span></div>
+            </div>
+        </div>
+
+        <div class="melody-section" id="melodySection" style="display:none;">
+            <div class="melody-header">
+                <div class="card-title" id="lbl_melody">🎵 球的旋律</div>
+                <span style="font-size:10px;color:var(--text-secondary);" id="lbl_melody_hint">由錄音時序 + 球的指紋生成</span>
+            </div>
+            <div class="melody-info">
+                <span><span id="lbl_m_root">根音</span><b id="melodyRoot">C</b></span>
+                <span><span id="lbl_m_scale">音階</span><b id="melodyScale">Pentatonic</b></span>
+                <span><span id="lbl_m_oct">八度</span><b id="melodyOct">2</b></span>
+                <span><span id="lbl_m_timbre">音色</span><b id="melodyTimbre">Triangle</b></span>
+                <span><span id="lbl_m_len">長度</span><b id="melodyLen">8</b> <span id="lbl_m_notes">音</span></span>
+                <span><span id="lbl_m_bpm">速度</span><b id="melodyBPM">120</b> BPM</span>
+                <span><span id="lbl_m_dur">時長</span><b id="melodyDur">2.0</b>s</span>
+            </div>
+            <div class="melody-notes" id="melodyNotes"></div>
+            <div class="melody-controls">
+                <button class="button primary" id="playMelodyBtn" onclick="toggleMelody()">▶ <span id="lbl_play">播放旋律</span></button>
+                <button class="button" id="loopMelodyBtn" onclick="toggleLoop()">↻ <span id="lbl_loop">循環</span></button>
+            </div>
+            <div class="melody-sliders">
+                <div class="melody-tempo">
+                    <span id="lbl_length">長度</span>
+                    <input type="range" id="lengthSlider" min="3" max="32" value="8" step="1" oninput="updateMelodyLength()">
+                    <span class="slider-val" id="lengthValue">8</span>
+                </div>
+                <div class="melody-tempo">
+                    <span id="lbl_tempo">速度</span>
+                    <input type="range" id="tempoSlider" min="60" max="200" value="120" step="5" oninput="updateTempo()">
+                    <span class="slider-val" id="tempoValue">120</span>
+                </div>
             </div>
         </div>
 
@@ -614,8 +1199,8 @@ const i18n = {
 let currentLang = 'zh';
 let audioContext;
 let mediaStream;
-let mediaRecorder;
-let audioChunks = [];
+let analyserNode;
+let sourceNode;
 let isRecording = false;
 let recordingDuration = 3;
 
@@ -691,11 +1276,15 @@ function switchTab(tab) {
 // ===== 麥克風 =====
 async function initMicrophone() {
     try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        });
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        mediaRecorder = new MediaRecorder(mediaStream);
-        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-        mediaRecorder.onstop = processAudio;
+        sourceNode = audioContext.createMediaStreamSource(mediaStream);
+        analyserNode = audioContext.createAnalyser();
+        analyserNode.fftSize = 2048;
+        analyserNode.smoothingTimeConstant = 0.3;
+        sourceNode.connect(analyserNode);
 
         document.getElementById('micStatus').textContent = '✓ ' + (currentLang === 'zh' ? '已連接' : currentLang === 'en' ? 'Connected' : '연결됨');
         document.getElementById('micStatus').style.color = '#00aa00';
@@ -707,108 +1296,482 @@ async function initMicrophone() {
     }
 }
 
-// ===== 錄音 =====
+// ===== 錄音（即時 FFT + 視覺化）=====
 function startRecording() {
-    if (!mediaRecorder || isRecording) return;
+    if (!analyserNode || isRecording) return;
+    if (audioContext.state === 'suspended') audioContext.resume();
 
-    audioChunks = [];
     isRecording = true;
-    
     document.getElementById('startButton').disabled = true;
     document.getElementById('durationSlider').disabled = true;
+    document.getElementById('liveMonitor').classList.add('active');
 
-    mediaRecorder.start();
-
-    let timeLeft = recordingDuration;
+    const monitor = document.getElementById('liveMonitor');
+    const elapsedEl = document.getElementById('lm_elapsed');
     const timer = document.getElementById('timer');
     timer.style.display = 'flex';
-    timer.textContent = timeLeft.toFixed(1);
 
-    const interval = setInterval(() => {
-        timeLeft -= 0.1;
-        timer.textContent = Math.max(0, timeLeft).toFixed(1);
+    const waveCv = document.getElementById('waveCanvas');
+    const specCv = document.getElementById('specCanvas');
+    const wctx = waveCv.getContext('2d');
+    const sctx = specCv.getContext('2d');
+    // 高 DPI
+    const dpr = window.devicePixelRatio || 1;
+    [waveCv, specCv].forEach(cv => {
+        cv.width = cv.clientWidth * dpr;
+        cv.height = cv.clientHeight * dpr;
+    });
 
-        if (timeLeft <= 0) {
-            clearInterval(interval);
-            mediaRecorder.stop();
-            isRecording = false;
-            timer.style.display = 'none';
+    const sr = audioContext.sampleRate;
+    const fftSize = analyserNode.fftSize;
+    const binCount = analyserNode.frequencyBinCount;
+    const freqBuf = new Uint8Array(binCount);
+    const timeBuf = new Uint8Array(fftSize);
+
+    // 累積容器（用於最終平均）
+    const sumSpec = new Float32Array(binCount);
+    let frameCount = 0;
+    let peakAmpDb = -Infinity;
+    const ampHistory = [];
+    const fluxHistory = [];
+    const centroidSeries = [];  // 用於旋律生成（C 方案：原始時序）
+    let prevSpec = null;
+
+    const startT = performance.now();
+    const durMs = recordingDuration * 1000;
+
+    function frame() {
+        const elapsed = performance.now() - startT;
+        const timeLeft = Math.max(0, recordingDuration - elapsed / 1000);
+        timer.textContent = timeLeft.toFixed(1);
+        elapsedEl.textContent = (elapsed / 1000).toFixed(1) + 's';
+
+        analyserNode.getByteFrequencyData(freqBuf);
+        analyserNode.getByteTimeDomainData(timeBuf);
+
+        // === 計算即時參數 ===
+        // 1. 振幅（RMS → dBFS）
+        let sumSq = 0;
+        for (let i = 0; i < timeBuf.length; i++) {
+            const v = (timeBuf[i] - 128) / 128;
+            sumSq += v * v;
         }
-    }, 100);
-}
+        const rms = Math.sqrt(sumSq / timeBuf.length);
+        const ampDb = rms > 0 ? Math.max(-60, 20 * Math.log10(rms)) : -60;
+        const ampClamped = Math.max(-40, Math.min(-3, ampDb));
+        if (ampDb > peakAmpDb) peakAmpDb = ampDb;
+        ampHistory.push(ampClamped);
 
-// ===== 處理音頻 =====
-async function processAudio() {
-    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-    const arrayBuffer = await audioBlob.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        // 2. 頻譜質心 / 展度
+        let total = 0, weighted = 0;
+        for (let i = 0; i < binCount; i++) {
+            const freq = (i * sr) / fftSize;
+            total += freqBuf[i];
+            weighted += freq * freqBuf[i];
+            sumSpec[i] += freqBuf[i];
+        }
+        const centroid = total > 0 ? weighted / total : 0;
+        let varSum = 0;
+        for (let i = 0; i < binCount; i++) {
+            const freq = (i * sr) / fftSize;
+            varSum += ((freq - centroid) ** 2) * freqBuf[i];
+        }
+        const spread = total > 0 ? Math.sqrt(varSum / total) : 0;
 
-    const params = analyzeAudio(audioBuffer);
-    displayResults(params);
-    
-    document.getElementById('startButton').disabled = false;
-    document.getElementById('durationSlider').disabled = false;
-}
+        // 3. Flux：相鄰幀頻譜差異
+        let flux = 0;
+        if (prevSpec) {
+            let diff = 0, base = 0;
+            for (let i = 0; i < binCount; i++) {
+                const d = freqBuf[i] - prevSpec[i];
+                if (d > 0) diff += d;
+                base += freqBuf[i] + prevSpec[i];
+            }
+            flux = base > 0 ? Math.min(1, (diff * 2) / base * 4) : 0;
+        }
+        fluxHistory.push(flux);
+        centroidSeries.push(centroid);
+        prevSpec = new Uint8Array(freqBuf);
+        frameCount++;
 
-// ===== 分析 =====
-function analyzeAudio(audioBuffer) {
-    const rawData = audioBuffer.getChannelData(0);
-    const rms = Math.sqrt(rawData.reduce((a, b) => a + b * b, 0) / rawData.length);
-    const amplitude = Math.max(-40, Math.min(-3, 20 * Math.log10(rms)));
+        // === 即時繪圖 ===
+        drawWaveform(wctx, waveCv, timeBuf);
+        drawSpectrum(sctx, specCv, freqBuf, sr, fftSize);
 
-    const offlineContext = new OfflineAudioContext(1, audioBuffer.length, audioBuffer.sampleRate);
-    const source = offlineContext.createBufferSource();
-    source.buffer = audioBuffer;
-    const analyser = offlineContext.createAnalyser();
-    analyser.fftSize = 2048;
-    source.connect(analyser);
-    analyser.connect(offlineContext.destination);
-    source.start(0);
+        // === 更新監測 UI ===
+        const ampPct = Math.max(0, Math.min(100, ((ampClamped + 40) / 37) * 100));
+        document.getElementById('liveAmp').textContent = ampDb > -60 ? ampClamped.toFixed(1) : '-∞';
+        document.getElementById('liveAmpBar').style.width = ampPct + '%';
 
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(dataArray);
+        document.getElementById('liveSC').textContent = Math.round(centroid);
+        document.getElementById('liveSCBar').style.width = Math.min(100, (centroid / 4000) * 100) + '%';
 
-    const totalEnergy = dataArray.reduce((a, b) => a + b);
-    let weightedFreq = 0;
+        document.getElementById('liveSS').textContent = Math.round(spread);
+        document.getElementById('liveSSBar').style.width = Math.min(100, (spread / 4000) * 100) + '%';
 
-    for (let i = 0; i < dataArray.length; i++) {
-        const freq = (i * audioBuffer.sampleRate) / analyser.fftSize;
-        weightedFreq += freq * dataArray[i];
+        document.getElementById('liveSF').textContent = flux.toFixed(2);
+        document.getElementById('liveSFBar').style.width = (flux * 100) + '%';
+
+        // 即時球體預覽（套用同樣的映射公式）
+        const livePrev = {
+            amplitude: ampClamped,
+            spectralCentroid: centroid,
+            spectralSpread: spread,
+            spectralFlux: flux
+        };
+        const liveProps = calculateSphereProps(livePrev);
+        const sph = document.getElementById('livePreviewSphere');
+        const size = 24 + liveProps.radius * 14;
+        sph.style.width = size + 'px';
+        sph.style.height = size + 'px';
+        sph.style.background = `hsl(${liveProps.hue}, 85%, 50%)`;
+        sph.style.boxShadow = `0 0 ${10 + liveProps.glow * 24}px hsla(${liveProps.hue}, 85%, 50%, ${0.4 + liveProps.glow * 0.5})`;
+        document.getElementById('liveHue').textContent = Math.round(liveProps.hue) + '°';
+        document.getElementById('liveR').textContent = liveProps.radius.toFixed(2);
+        document.getElementById('liveG').textContent = liveProps.glow.toFixed(2);
+
+        if (elapsed < durMs) {
+            requestAnimationFrame(frame);
+        } else {
+            finalize();
+        }
     }
 
-    const spectralCentroid = totalEnergy > 0 ? weightedFreq / totalEnergy : 1000;
+    function finalize() {
+        isRecording = false;
+        document.getElementById('startButton').disabled = false;
+        document.getElementById('durationSlider').disabled = false;
+        timer.style.display = 'none';
 
-    let variance = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-        const freq = (i * audioBuffer.sampleRate) / analyser.fftSize;
-        variance += ((freq - spectralCentroid) ** 2) * dataArray[i];
+        // 最終參數：頻譜用累積平均，振幅用峰值 + 平均混合
+        const avgSpec = new Float32Array(binCount);
+        for (let i = 0; i < binCount; i++) avgSpec[i] = sumSpec[i] / Math.max(1, frameCount);
+
+        let total = 0, weighted = 0;
+        for (let i = 0; i < binCount; i++) {
+            const freq = (i * sr) / fftSize;
+            total += avgSpec[i];
+            weighted += freq * avgSpec[i];
+        }
+        const centroid = total > 0 ? weighted / total : 0;
+        let varSum = 0;
+        for (let i = 0; i < binCount; i++) {
+            const freq = (i * sr) / fftSize;
+            varSum += ((freq - centroid) ** 2) * avgSpec[i];
+        }
+        const spread = total > 0 ? Math.sqrt(varSum / total) : 0;
+
+        // 振幅：用峰值更能反映「最大聲音」
+        const finalAmp = Math.max(-40, Math.min(-3, peakAmpDb));
+        // Flux：取平均
+        const avgFlux = fluxHistory.reduce((a, b) => a + b, 0) / Math.max(1, fluxHistory.length);
+
+        const params = {
+            amplitude: Math.round(finalAmp * 10) / 10,
+            spectralCentroid: Math.round(centroid),
+            spectralSpread: Math.round(spread),
+            spectralFlux: Math.round(avgFlux * 100) / 100
+        };
+        displayResults(params);
+
+        // 生成旋律（用原始時序 + 球的指紋）
+        const sphereProps = calculateSphereProps(params);
+        window.lastRecording = { centroidSeries: centroidSeries.slice(), ampHistory: ampHistory.slice(), sphereProps };
+        window.lastMelody = generateMelody(centroidSeries, ampHistory, sphereProps, melodyLength);
+        renderMelodyUI(window.lastMelody);
+        document.getElementById('melodySection').style.display = 'block';
     }
-    const spectralSpread = Math.sqrt(variance / (totalEnergy || 1));
 
-    const highFreq = dataArray.slice(dataArray.length / 2).reduce((a, b) => a + b);
-    const lowFreq = dataArray.slice(0, dataArray.length / 2).reduce((a, b) => a + b);
-    const spectralFlux = Math.min(1, Math.abs(highFreq - lowFreq) / (highFreq + lowFreq + 1));
+    requestAnimationFrame(frame);
+}
 
-    return {
-        amplitude: Math.round(amplitude * 10) / 10,
-        spectralCentroid: Math.round(spectralCentroid),
-        spectralSpread: Math.round(spectralSpread),
-        spectralFlux: Math.round(spectralFlux * 100) / 100
-    };
+// ===== 視覺化繪製 =====
+function drawWaveform(ctx, cv, timeBuf) {
+    const W = cv.width, H = cv.height;
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, W, H);
+    // 中線
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+    // 波形
+    ctx.strokeStyle = '#0066cc';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    const step = W / timeBuf.length;
+    for (let i = 0; i < timeBuf.length; i++) {
+        const y = (timeBuf[i] / 255) * H;
+        i ? ctx.lineTo(i * step, y) : ctx.moveTo(0, y);
+    }
+    ctx.stroke();
+}
+
+function drawSpectrum(ctx, cv, freqBuf, sr, fftSize) {
+    const W = cv.width, H = cv.height;
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, W, H);
+
+    // 只畫到 4kHz（人聲主要範圍）
+    const maxHz = 4000;
+    const maxBin = Math.min(freqBuf.length, Math.floor(maxHz * fftSize / sr));
+    const barW = W / maxBin;
+
+    for (let i = 0; i < maxBin; i++) {
+        const v = freqBuf[i] / 255;
+        const h = v * H;
+        // 對應到 hue：低頻紅 → 高頻藍
+        const hue = (i / maxBin) * 270;
+        ctx.fillStyle = `hsl(${hue}, 85%, 55%)`;
+        ctx.fillRect(i * barW, H - h, Math.max(1, barW - 0.5), h);
+    }
+
+    // 頻率刻度
+    ctx.fillStyle = '#666';
+    ctx.font = '10px monospace';
+    [500, 1000, 2000, 3000].forEach(hz => {
+        const x = (hz * fftSize / sr / maxBin) * W;
+        if (x < W - 20) {
+            ctx.fillRect(x, 0, 1, 4);
+            ctx.fillText(hz + 'Hz', x + 2, 12);
+        }
+    });
+}
+
+// ===== 映射設定 =====
+const DEFAULT_MAPPING = {
+    amp:      { inMin: -40, inMax: -3,    outMin: 0.2, outMax: 2.0 },
+    spread:   { inMin: 0,   inMax: 4000,  outMin: 0.1, outMax: 0.9 },
+    centroid: { inMin: 100, inMax: 2000,  outMin: 0,   outMax: 270, log: true },
+    flux:     { inMin: 0,   inMax: 1,     outMin: 0,   outMax: 1 }
+};
+let mapping = JSON.parse(JSON.stringify(DEFAULT_MAPPING));
+
+function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+function mapValue(v, m) {
+    let n;
+    if (m.log) {
+        const lo = Math.max(0.0001, m.inMin);
+        const hi = Math.max(lo * 1.0001, m.inMax);
+        const x = Math.max(lo, v);
+        n = clamp01(Math.log2(x / lo) / Math.log2(hi / lo));
+    } else {
+        const range = m.inMax - m.inMin;
+        n = range !== 0 ? clamp01((v - m.inMin) / range) : 0;
+    }
+    return m.outMin + n * (m.outMax - m.outMin);
 }
 
 // ===== 球體屬性 =====
 function calculateSphereProps(params) {
-    const normAmp = (params.amplitude + 40) / 37;
-    const radius = 0.2 + normAmp * 1.8;
-    const normSS = params.spectralSpread / 7920;
-    const glow = 0.1 + normSS * 0.8;
-    const logFreq = Math.log2(Math.max(params.spectralCentroid, 20) / 20);
-    const normFreq = Math.max(0, Math.min(1, logFreq / 9.97));
-    const hue = normFreq * 270;
-    const roughness = params.spectralFlux;
+    return {
+        radius:    mapValue(params.amplitude,       mapping.amp),
+        glow:      mapValue(params.spectralSpread,  mapping.spread),
+        hue:       mapValue(params.spectralCentroid, mapping.centroid),
+        roughness: mapValue(params.spectralFlux,    mapping.flux)
+    };
+}
 
-    return { radius, glow, hue, roughness };
+// ===== Mapping 載入 / 儲存 / 重置 / UI =====
+function loadMapping() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('audio_sphere.mapping') || 'null');
+        if (saved && saved.amp) mapping = { ...DEFAULT_MAPPING, ...saved };
+    } catch {}
+}
+
+let saveHintTimer = null;
+function saveMapping() {
+    localStorage.setItem('audio_sphere.mapping', JSON.stringify(mapping));
+    const hint = document.getElementById('mapSaveHint');
+    if (hint) {
+        hint.classList.add('show');
+        clearTimeout(saveHintTimer);
+        saveHintTimer = setTimeout(() => hint.classList.remove('show'), 1200);
+    }
+}
+
+function resetMapping() {
+    mapping = JSON.parse(JSON.stringify(DEFAULT_MAPPING));
+    synth = JSON.parse(JSON.stringify(DEFAULT_SYNTH));
+    saveMapping();
+    saveSynth();
+    syncMappingUI();
+    syncSynthUI();
+    syncManualSliders();
+    updateManual();
+    regenerateMelodyFromSynth();
+}
+
+function exportMapping() {
+    navigator.clipboard.writeText(JSON.stringify({ mapping, synth }, null, 2));
+    saveMapping();
+}
+
+function syncMappingUI() {
+    const fields = [
+        ['mapAmpInMin', 'amp', 'inMin'], ['mapAmpInMax', 'amp', 'inMax'],
+        ['mapAmpOutMin', 'amp', 'outMin'], ['mapAmpOutMax', 'amp', 'outMax'],
+        ['mapSSInMin', 'spread', 'inMin'], ['mapSSInMax', 'spread', 'inMax'],
+        ['mapSSOutMin', 'spread', 'outMin'], ['mapSSOutMax', 'spread', 'outMax'],
+        ['mapSCInMin', 'centroid', 'inMin'], ['mapSCInMax', 'centroid', 'inMax'],
+        ['mapSCOutMin', 'centroid', 'outMin'], ['mapSCOutMax', 'centroid', 'outMax'],
+        ['mapSFInMin', 'flux', 'inMin'], ['mapSFInMax', 'flux', 'inMax'],
+        ['mapSFOutMin', 'flux', 'outMin'], ['mapSFOutMax', 'flux', 'outMax']
+    ];
+    fields.forEach(([id, group, key]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = mapping[group][key];
+    });
+    const logCb = document.getElementById('mapSCLog');
+    if (logCb) logCb.checked = !!mapping.centroid.log;
+    updateHuePreview();
+}
+
+function updateHuePreview() {
+    const bar = document.getElementById('mapHuePreview');
+    if (!bar) return;
+    const from = mapping.centroid.outMin;
+    const to = mapping.centroid.outMax;
+    const stops = [];
+    for (let i = 0; i <= 6; i++) {
+        const h = from + (to - from) * (i / 6);
+        stops.push(`hsl(${h}, 85%, 50%) ${(i / 6) * 100}%`);
+    }
+    bar.style.background = `linear-gradient(to right, ${stops.join(', ')})`;
+}
+
+function syncManualSliders() {
+    const set = (id, mi, ma, st) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.min = mi; el.max = ma;
+        if (st != null) el.step = st;
+        if (parseFloat(el.value) < mi) el.value = mi;
+        if (parseFloat(el.value) > ma) el.value = ma;
+    };
+    set('ampSlider', mapping.amp.inMin, mapping.amp.inMax, 1);
+    set('ssSlider', mapping.spread.inMin, mapping.spread.inMax, 50);
+    set('scSlider', mapping.centroid.inMin, mapping.centroid.inMax, 10);
+    set('sfSlider', mapping.flux.inMin, mapping.flux.inMax, 0.01);
+}
+
+// ===== Synth 載入 / 儲存 / 同步 / 綁定 =====
+function loadSynth() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('audio_sphere.synth') || 'null');
+        if (saved) synth = { ...DEFAULT_SYNTH, ...saved };
+    } catch {}
+}
+
+function saveSynth() {
+    localStorage.setItem('audio_sphere.synth', JSON.stringify(synth));
+    const hint = document.getElementById('mapSaveHint');
+    if (hint) {
+        hint.classList.add('show');
+        clearTimeout(saveHintTimer);
+        saveHintTimer = setTimeout(() => hint.classList.remove('show'), 1200);
+    }
+}
+
+function syncSynthUI() {
+    const fields = {
+        synthScale: synth.scale,
+        synthWaveform: synth.waveform,
+        synthBaseMidi: synth.baseMidi,
+        synthMinVel: synth.minVel,
+        synthBpmMin: synth.bpmMin,
+        synthBpmMax: synth.bpmMax,
+        synthCutMin: synth.cutoffMin,
+        synthCutMax: synth.cutoffMax,
+        synthFilterQ: synth.filterQ,
+        synthSilenceDb: synth.silenceDbfs
+    };
+    Object.keys(fields).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = fields[id];
+    });
+}
+
+function regenerateMelodyFromSynth() {
+    if (!window.lastRecording) return;
+    const wasPlaying = melodyPlaying;
+    stopMelody();
+    const r = window.lastRecording;
+    window.lastMelody = generateMelody(r.centroidSeries, r.ampHistory, r.sphereProps, melodyLength);
+    renderMelodyUI(window.lastMelody);
+    if (wasPlaying) playMelody();
+}
+
+function wireSynthInputs() {
+    const mapping = [
+        ['synthScale',     'scale',       'string'],
+        ['synthWaveform',  'waveform',    'string'],
+        ['synthBaseMidi',  'baseMidi',    'int'],
+        ['synthMinVel',    'minVel',      'float'],
+        ['synthBpmMin',    'bpmMin',      'int'],
+        ['synthBpmMax',    'bpmMax',      'int'],
+        ['synthCutMin',    'cutoffMin',   'int'],
+        ['synthCutMax',    'cutoffMax',   'int'],
+        ['synthFilterQ',   'filterQ',     'float'],
+        ['synthSilenceDb', 'silenceDbfs', 'int']
+    ];
+    mapping.forEach(([id, key, type]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const evt = el.tagName === 'SELECT' ? 'change' : 'input';
+        el.addEventListener(evt, () => {
+            let v = el.value;
+            if (type === 'int') v = parseInt(v);
+            else if (type === 'float') v = parseFloat(v);
+            if (type !== 'string' && isNaN(v)) return;
+            synth[key] = v;
+            saveSynth();
+            regenerateMelodyFromSynth();
+        });
+    });
+}
+
+function wireMappingInputs() {
+    const map = [
+        ['mapAmpInMin', 'amp', 'inMin'], ['mapAmpInMax', 'amp', 'inMax'],
+        ['mapAmpOutMin', 'amp', 'outMin'], ['mapAmpOutMax', 'amp', 'outMax'],
+        ['mapSSInMin', 'spread', 'inMin'], ['mapSSInMax', 'spread', 'inMax'],
+        ['mapSSOutMin', 'spread', 'outMin'], ['mapSSOutMax', 'spread', 'outMax'],
+        ['mapSCInMin', 'centroid', 'inMin'], ['mapSCInMax', 'centroid', 'inMax'],
+        ['mapSCOutMin', 'centroid', 'outMin'], ['mapSCOutMax', 'centroid', 'outMax'],
+        ['mapSFInMin', 'flux', 'inMin'], ['mapSFInMax', 'flux', 'inMax'],
+        ['mapSFOutMin', 'flux', 'outMin'], ['mapSFOutMax', 'flux', 'outMax']
+    ];
+    map.forEach(([id, group, key]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', () => {
+            const v = parseFloat(el.value);
+            if (!isNaN(v)) {
+                mapping[group][key] = v;
+                saveMapping();
+                if (group === 'centroid') updateHuePreview();
+                syncManualSliders();
+                updateManual();
+                // 球的指紋改變 → 同步更新已存的 sphereProps 並重生旋律
+                if (window.lastRecording && window.lastParams) {
+                    window.lastRecording.sphereProps = calculateSphereProps(window.lastParams);
+                    regenerateMelodyFromSynth();
+                }
+            }
+        });
+    });
+    const logCb = document.getElementById('mapSCLog');
+    if (logCb) logCb.addEventListener('change', () => {
+        mapping.centroid.log = logCb.checked;
+        saveMapping();
+        updateManual();
+        if (window.lastRecording && window.lastParams) {
+            window.lastRecording.sphereProps = calculateSphereProps(window.lastParams);
+            regenerateMelodyFromSynth();
+        }
+    });
 }
 
 function getColorName(hue) {
@@ -874,6 +1837,310 @@ function displayResults(params) {
     window.lastParams = params;
 }
 
+// ===== 旋律生成 (B+C 混合：原始時序 + 球的指紋) =====
+const ROOT_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const SCALES = {
+    pentatonic: [0, 2, 4, 7, 9],
+    major:      [0, 2, 4, 5, 7, 9, 11],
+    minor:      [0, 2, 3, 5, 7, 8, 10],
+    lydian:     [0, 2, 4, 6, 7, 9, 11],
+    wholeTone:  [0, 2, 4, 6, 8, 10],
+    chromatic:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+};
+const SCALE_NAMES = {
+    pentatonic: 'Pentatonic', major: 'Major', minor: 'Natural Minor',
+    lydian: 'Lydian', wholeTone: 'Whole Tone', chromatic: 'Chromatic'
+};
+const DEFAULT_SYNTH = {
+    scale: 'pentatonic',
+    waveform: 'auto',          // auto = 依 roughness
+    baseMidi: 48,              // C3
+    minVel: 0.15,
+    bpmMin: 90,
+    bpmMax: 150,
+    cutoffMin: 400,
+    cutoffMax: 6400,
+    filterQ: 1.2,
+    silenceDbfs: -38
+};
+let synth = JSON.parse(JSON.stringify(DEFAULT_SYNTH));
+let melodyLength = 8;                          // 旋律音數（唱片唱針概念：短）
+
+function midiToFreq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+
+function generateMelody(centroidSeries, ampSeries, props, length) {
+    const N_NOTES = length || melodyLength;
+    const scale = SCALES[synth.scale] || SCALES.pentatonic;
+    const scaleName = SCALE_NAMES[synth.scale] || 'Pentatonic';
+
+    // 1. 根音由 hue 決定
+    const rootIdx = Math.floor(((props.hue % 360) / 360) * 12) % 12;
+    const rootMidi = synth.baseMidi + rootIdx;
+    const rootName = ROOT_NAMES[rootIdx];
+
+    // 2. 八度範圍由 radius 決定 (1~3 octaves)
+    const octaveRange = Math.max(1, Math.min(3, Math.round(props.radius)));
+
+    // 3. 波形：auto 模式依 roughness，否則用使用者選擇
+    let waveform = synth.waveform;
+    if (waveform === 'auto') {
+        if (props.roughness > 0.7) waveform = 'sawtooth';
+        else if (props.roughness > 0.4) waveform = 'square';
+        else if (props.roughness > 0.15) waveform = 'triangle';
+        else waveform = 'sine';
+    }
+
+    // 4. 裁掉開頭/結尾的靜音段（唱片唱針概念：必須從第一聲就開始）
+    const silenceThresh = synth.silenceDbfs;
+    let startIdx = 0, endIdx = ampSeries.length - 1;
+    for (let i = 0; i < ampSeries.length; i++) {
+        if (ampSeries[i] > silenceThresh) { startIdx = i; break; }
+    }
+    for (let i = ampSeries.length - 1; i >= startIdx; i--) {
+        if (ampSeries[i] > silenceThresh) { endIdx = i; break; }
+    }
+    if (endIdx <= startIdx + 2) {
+        // 整段太安靜 → 用全範圍 fallback
+        startIdx = 0;
+        endIdx = ampSeries.length - 1;
+    }
+    const trimmedC = centroidSeries.slice(startIdx, endIdx + 1);
+    const trimmedA = ampSeries.slice(startIdx, endIdx + 1);
+
+    // 5. 降採樣 centroid + amp 到 N_NOTES 個音（基於 trimmed 範圍）
+    const len = trimmedC.length;
+    const downsampled = [];
+    for (let i = 0; i < N_NOTES; i++) {
+        const lo = Math.floor((i * len) / N_NOTES);
+        const hi = Math.max(lo + 1, Math.floor(((i + 1) * len) / N_NOTES));
+        let cSum = 0, aSum = 0, n = 0;
+        for (let j = lo; j < hi; j++) {
+            cSum += trimmedC[j] || 0;
+            aSum += trimmedA[j] || -60;
+            n++;
+        }
+        downsampled.push({
+            centroid: n ? cSum / n : 0,
+            amp: n ? aSum / n : -60
+        });
+    }
+
+    // 6. 找有效 centroid 範圍以對齊音域
+    const active = downsampled.filter(d => d.centroid > 0);
+    const cMin = active.length ? Math.min(...active.map(d => d.centroid)) : 100;
+    const cMax = active.length ? Math.max(...active.map(d => d.centroid)) : 2000;
+    const cRange = Math.max(50, cMax - cMin);
+
+    // 7. 量化到所選音階 — 唱片概念：每格都發聲，不再有休止符
+    const stepCount = scale.length * octaveRange;
+    const notes = downsampled.map(d => {
+        const t = Math.max(0, Math.min(1, (d.centroid - cMin) / cRange));
+        const stepIdx = Math.min(stepCount - 1, Math.floor(t * stepCount));
+        const oct = Math.floor(stepIdx / scale.length);
+        const interval = scale[stepIdx % scale.length];
+        const midi = rootMidi + oct * 12 + interval;
+        // velocity 至少 synth.minVel，保證每格都聽得見；安靜段就柔，響的就強
+        const velocity = Math.max(synth.minVel, Math.min(1, (d.amp + 40) / 37));
+        return { midi, freq: midiToFreq(midi), velocity, rest: false };
+    });
+
+    // 8. BPM 範圍由 synth 決定，roughness 在此範圍內線性映射
+    const bpm = Math.round(synth.bpmMin + props.roughness * (synth.bpmMax - synth.bpmMin));
+    const stepSec = 60 / bpm / 2;                          // 8分音符
+
+    // 9. 濾波器 cutoff 範圍由 synth 決定，glow 在此範圍內線性映射
+    const cutoff = synth.cutoffMin + props.glow * (synth.cutoffMax - synth.cutoffMin);
+
+    return {
+        notes, rootMidi, rootName, octaveRange, waveform,
+        bpm, stepSec, cutoff, filterQ: synth.filterQ,
+        scaleName
+    };
+}
+
+// ===== 旋律播放 =====
+let melodyPlaying = false;
+let melodyLoop = false;
+let melodyScheduled = [];
+let melodyTimers = [];
+let melodyEndTimer = null;
+
+function toggleMelody() {
+    if (melodyPlaying) stopMelody();
+    else playMelody();
+}
+
+function toggleLoop() {
+    melodyLoop = !melodyLoop;
+    const btn = document.getElementById('loopMelodyBtn');
+    btn.style.background = melodyLoop ? 'var(--accent)' : '';
+    btn.style.color = melodyLoop ? '#fff' : '';
+}
+
+function updateTempo() {
+    const v = parseInt(document.getElementById('tempoSlider').value);
+    document.getElementById('tempoValue').textContent = v;
+    document.getElementById('melodyBPM').textContent = v;
+    if (window.lastMelody) {
+        window.lastMelody.bpm = v;
+        window.lastMelody.stepSec = 60 / v / 2;
+        updateMelodyDurationLabel();
+    }
+}
+
+function updateMelodyLength() {
+    const v = parseInt(document.getElementById('lengthSlider').value);
+    melodyLength = v;
+    document.getElementById('lengthValue').textContent = v;
+    document.getElementById('melodyLen').textContent = v;
+    if (window.lastRecording) {
+        const wasPlaying = melodyPlaying;
+        stopMelody();
+        const r = window.lastRecording;
+        const prevBpm = window.lastMelody ? window.lastMelody.bpm : 120;
+        window.lastMelody = generateMelody(r.centroidSeries, r.ampHistory, r.sphereProps, v);
+        window.lastMelody.bpm = prevBpm;
+        window.lastMelody.stepSec = 60 / prevBpm / 2;
+        renderMelodyUI(window.lastMelody);
+        if (wasPlaying) playMelody();
+    }
+}
+
+function updateMelodyDurationLabel() {
+    if (!window.lastMelody) return;
+    const m = window.lastMelody;
+    const dur = m.notes.length * m.stepSec;
+    document.getElementById('melodyDur').textContent = dur.toFixed(1);
+}
+
+function playMelody() {
+    if (!window.lastMelody) return;
+    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === 'suspended') audioContext.resume();
+
+    stopMelody();
+    melodyPlaying = true;
+    document.getElementById('playMelodyBtn').innerHTML = '⏹ <span>停止</span>';
+
+    const m = window.lastMelody;
+    const t0 = audioContext.currentTime + 0.05;
+
+    // master chain: filter → gain → out
+    const filter = audioContext.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = m.cutoff;
+    filter.Q.value = m.filterQ != null ? m.filterQ : 1.2;
+    const masterGain = audioContext.createGain();
+    masterGain.gain.value = 0.35;
+    filter.connect(masterGain);
+    masterGain.connect(audioContext.destination);
+
+    m.notes.forEach((note, i) => {
+        const startT = t0 + i * m.stepSec;
+        const dur = m.stepSec * 0.85;
+
+        // 視覺高亮
+        const ms = (startT - audioContext.currentTime) * 1000;
+        melodyTimers.push(setTimeout(() => highlightNote(i), ms));
+
+        if (note.rest) return;
+
+        const osc = audioContext.createOscillator();
+        osc.type = m.waveform;
+        osc.frequency.value = note.freq;
+
+        const env = audioContext.createGain();
+        env.gain.value = 0;
+        osc.connect(env);
+        env.connect(filter);
+
+        // ADSR
+        const peak = note.velocity * 0.7;
+        env.gain.setValueAtTime(0, startT);
+        env.gain.linearRampToValueAtTime(peak, startT + 0.01);
+        env.gain.linearRampToValueAtTime(peak * 0.6, startT + dur * 0.4);
+        env.gain.linearRampToValueAtTime(0, startT + dur);
+
+        osc.start(startT);
+        osc.stop(startT + dur + 0.05);
+        melodyScheduled.push({ osc, env });
+    });
+
+    const totalMs = m.notes.length * m.stepSec * 1000;
+    melodyEndTimer = setTimeout(() => {
+        highlightNote(-1);
+        if (melodyLoop && melodyPlaying) {
+            playMelody();
+        } else {
+            melodyPlaying = false;
+            document.getElementById('playMelodyBtn').innerHTML = '▶ <span>播放旋律</span>';
+        }
+    }, totalMs + 100);
+}
+
+function stopMelody() {
+    melodyTimers.forEach(t => clearTimeout(t));
+    melodyTimers = [];
+    if (melodyEndTimer) { clearTimeout(melodyEndTimer); melodyEndTimer = null; }
+    melodyScheduled.forEach(({ osc, env }) => {
+        try {
+            const now = audioContext.currentTime;
+            env.gain.cancelScheduledValues(now);
+            env.gain.linearRampToValueAtTime(0, now + 0.03);
+            osc.stop(now + 0.05);
+        } catch {}
+    });
+    melodyScheduled = [];
+    melodyPlaying = false;
+    document.getElementById('playMelodyBtn').innerHTML = '▶ <span>播放旋律</span>';
+    highlightNote(-1);
+}
+
+function highlightNote(idx) {
+    document.querySelectorAll('.melody-note').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+    });
+}
+
+function renderMelodyUI(m) {
+    document.getElementById('melodyRoot').textContent = m.rootName;
+    document.getElementById('melodyScale').textContent = m.scaleName;
+    document.getElementById('melodyOct').textContent = m.octaveRange;
+    document.getElementById('melodyTimbre').textContent = m.waveform;
+    document.getElementById('melodyBPM').textContent = m.bpm;
+    document.getElementById('tempoSlider').value = m.bpm;
+    document.getElementById('tempoValue').textContent = m.bpm;
+    document.getElementById('melodyLen').textContent = m.notes.length;
+    document.getElementById('lengthSlider').value = m.notes.length;
+    document.getElementById('lengthValue').textContent = m.notes.length;
+    document.getElementById('melodyDur').textContent = (m.notes.length * m.stepSec).toFixed(1);
+
+    // 找有效音的 midi 範圍以設定 bar 高度
+    const activeMidis = m.notes.filter(n => !n.rest).map(n => n.midi);
+    const midiMin = activeMidis.length ? Math.min(...activeMidis) : 60;
+    const midiMax = activeMidis.length ? Math.max(...activeMidis) : 72;
+    const midiRange = Math.max(1, midiMax - midiMin);
+
+    const container = document.getElementById('melodyNotes');
+    container.innerHTML = '';
+    m.notes.forEach((note, i) => {
+        const bar = document.createElement('div');
+        bar.className = 'melody-note';
+        if (note.rest) {
+            bar.classList.add('rest');
+            bar.style.height = '4px';
+            bar.title = `${i + 1}: 休止`;
+        } else {
+            const h = 15 + ((note.midi - midiMin) / midiRange) * 80;
+            bar.style.height = h + '%';
+            bar.style.background = `hsl(${(window.lastProps?.hue || 0) + (note.midi - midiMin) * 8}, 85%, 55%)`;
+            const noteName = ROOT_NAMES[note.midi % 12] + Math.floor(note.midi / 12 - 1);
+            bar.title = `${i + 1}: ${noteName} (vel ${note.velocity.toFixed(2)})`;
+        }
+        container.appendChild(bar);
+    });
+}
+
 // ===== 導出 =====
 function exportJSON() {
     if (!window.lastParams) return;
@@ -910,8 +2177,11 @@ sphere_roughness = spectralFlux`;
 
 // ===== 重置 =====
 function reset() {
+    stopMelody();
     document.getElementById('resultsCard').style.display = 'none';
     document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('melodySection').style.display = 'none';
+    document.getElementById('liveMonitor').classList.remove('active');
     updateManual();
 }
 
@@ -921,6 +2191,13 @@ document.getElementById('durationSlider').addEventListener('input', (e) => {
     document.getElementById('durationDisplay').textContent = recordingDuration.toFixed(1);
 });
 
+loadMapping();
+loadSynth();
+syncMappingUI();
+syncSynthUI();
+wireMappingInputs();
+wireSynthInputs();
+syncManualSliders();
 updateManual();
 </script>
 
