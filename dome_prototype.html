@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>聲音穹頂 · Sound Dome</title>
+<style>
+:root{
+  --bg:#000; --bg-2:#0a0a0a; --fg:#fff; --muted:#888;
+  --accent:#ffd700; --accent-dim:#3a2d00; --line:#1f1f1f;
+  --safe-top:env(safe-area-inset-top,0); --safe-bot:env(safe-area-inset-bottom,0);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang TC","Microsoft JhengHei",sans-serif;
+  overflow:hidden;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer;font-size:14px}
+
+#app{position:fixed;inset:0;display:flex;flex-direction:column;
+  padding-top:var(--safe-top);padding-bottom:var(--safe-bot)}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  padding:14px 20px;border-bottom:1px solid var(--line);flex-shrink:0}
+.brand{font-size:12px;letter-spacing:.25em;color:var(--accent);font-weight:600}
+.lang{display:flex;gap:4px}
+.lang button{font-size:11px;padding:5px 9px;border-radius:10px;color:var(--muted);letter-spacing:.1em}
+.lang button.active{background:var(--accent-dim);color:var(--accent)}
+
+.screen{flex:1;display:none;flex-direction:column;padding:24px 20px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch}
+.screen.active{display:flex;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.landing{justify-content:center;align-items:center;text-align:center;gap:22px}
+.qr-box{width:140px;height:140px;background:#fff;display:flex;align-items:center;justify-content:center;
+  border-radius:10px;color:#000;font-family:monospace;font-size:10px;text-align:center;padding:10px;
+  letter-spacing:.05em;line-height:1.5;position:relative}
+.qr-box::before,.qr-box::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--accent)}
+.qr-box::before{top:-6px;left:-6px;border-right:none;border-bottom:none}
+.qr-box::after{bottom:-6px;right:-6px;border-left:none;border-top:none}
+.landing h1{font-size:26px;font-weight:300;letter-spacing:.12em;line-height:1.5}
+.landing h1 b{color:var(--accent);font-weight:600}
+.landing p{color:var(--muted);font-size:13px;max-width:280px;line-height:1.7}
+.cta{margin-top:4px;padding:15px 36px;border:1px solid var(--accent);color:var(--accent);
+  border-radius:40px;font-size:13px;letter-spacing:.22em;font-weight:500;transition:all .2s;min-width:220px}
+.cta:active{transform:scale(.97)}
+.cta.primary{background:var(--accent);color:#000}
+
+.record-wrap{align-items:center;justify-content:center;gap:30px}
+.record-hint{color:var(--muted);font-size:12px;text-align:center;letter-spacing:.15em}
+.mic-ring{width:240px;height:240px;border-radius:50%;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;position:relative}
+.mic-ring::before,.mic-ring::after{content:"";position:absolute;inset:-1px;border-radius:50%;
+  border:1px solid var(--accent);opacity:0;pointer-events:none}
+.mic-ring.rec::before{animation:pulse 1.5s ease-out infinite}
+.mic-ring.rec::after{animation:pulse 1.5s ease-out .5s infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.3);opacity:0}}
+.mic-btn{width:160px;height:160px;border-radius:50%;background:var(--accent);color:#000;
+  font-size:12px;letter-spacing:.22em;font-weight:700;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;box-shadow:0 0 40px rgba(255,215,0,.3);transition:all .2s}
+.mic-btn.rec{background:#000;color:var(--accent);border:2px solid var(--accent);box-shadow:0 0 70px rgba(255,215,0,.6)}
+.mic-icon{font-size:28px;line-height:1}
+.countdown{font-size:42px;font-weight:200;color:var(--accent);letter-spacing:.05em;
+  height:50px;display:flex;align-items:center}
+.wave-cv{width:100%;max-width:320px;height:50px}
+
+.sphere-screen{align-items:center;gap:14px;justify-content:flex-start;padding-top:18px}
+.sphere-cv{width:260px;height:260px;display:block}
+.head-row{width:100%;max-width:320px;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:-6px}
+.head-row h2{font-size:13px;font-weight:500;letter-spacing:.25em;color:var(--accent)}
+.head-row span{font-size:11px;color:var(--muted);letter-spacing:.15em;font-family:monospace}
+
+.melody-row{width:100%;max-width:320px;display:flex;align-items:center;gap:10px}
+.melody-play{flex:1;padding:13px 16px;border-radius:30px;border:1px solid var(--accent);
+  color:var(--accent);font-size:12px;letter-spacing:.18em;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.melody-play.playing{background:var(--accent);color:#000;box-shadow:0 0 24px rgba(255,215,0,.45)}
+.melody-play:active{transform:scale(.97)}
+.melody-bars{display:flex;align-items:flex-end;gap:2px;height:34px;flex:0 0 90px;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:5px 6px}
+.melody-bars .bar{flex:1;background:var(--accent);opacity:.4;border-radius:1px;min-height:3px;
+  transition:opacity .1s,transform .1s}
+.melody-bars .bar.active{opacity:1;transform:scaleY(1.15);box-shadow:0 0 6px var(--accent)}
+
+.sphere-meta{width:100%;max-width:320px;display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.meta-cell{background:var(--bg-2);padding:9px 14px}
+.meta-label{font-size:10px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase}
+.meta-val{font-size:13px;color:var(--accent);font-weight:500;margin-top:3px;font-family:monospace}
+.actions{display:flex;gap:10px;width:100%;max-width:320px;margin-top:4px}
+.actions button{flex:1;padding:14px;border-radius:30px;font-size:12px;letter-spacing:.18em;font-weight:500}
+.btn-secondary{border:1px solid var(--line);color:var(--muted)}
+.btn-secondary:active{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#000}
+
+.list-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.list-head h2{font-size:13px;font-weight:500;letter-spacing:.25em;color:var(--accent)}
+.list-head span{font-size:11px;color:var(--muted);letter-spacing:.15em;font-family:monospace}
+.spheres-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.sphere-cell{aspect-ratio:1;background:var(--bg-2);border-radius:12px;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .2s;position:relative}
+.sphere-cell:active{transform:scale(.95);border-color:var(--accent)}
+.sphere-cell canvas{width:88%;height:88%}
+.sphere-cell .cell-idx{position:absolute;top:4px;left:6px;font-size:9px;color:var(--muted);
+  font-family:monospace;letter-spacing:.05em}
+.empty{color:var(--muted);text-align:center;padding:60px 20px;font-size:13px;
+  letter-spacing:.1em;line-height:1.8;white-space:pre-line}
+
+/* 唱片展場 */
+.exhibit-screen{padding:0;position:relative}
+.exhibit-cv{flex:1;width:100%;display:block;background:radial-gradient(ellipse at center,#0a0a14 0%,#000 70%);
+  position:relative;z-index:1}
+.vinyl-overlay{position:absolute;top:0;left:0;right:0;pointer-events:none;padding:14px 16px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:10px;z-index:20}
+.vinyl-now{background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:11px;
+  color:var(--muted);letter-spacing:.12em;font-family:monospace;line-height:1.6;
+  pointer-events:none;max-width:60%}
+.vinyl-now b{color:var(--accent);font-weight:600;letter-spacing:.05em}
+.vinyl-now .vinyl-bars{display:flex;align-items:flex-end;gap:2px;height:20px;margin-top:4px}
+.vinyl-now .vinyl-bars .bar{width:4px;background:var(--accent);opacity:.4;border-radius:1px;min-height:3px}
+.vinyl-now .vinyl-bars .bar.active{opacity:1;box-shadow:0 0 6px var(--accent)}
+.vinyl-toggle{pointer-events:auto;background:rgba(255,215,0,.95);color:#000;font-size:11px;
+  font-weight:700;letter-spacing:.18em;padding:11px 18px;border-radius:30px;transition:all .15s;
+  box-shadow:0 4px 20px rgba(255,215,0,.45);cursor:pointer;
+  touch-action:manipulation;-webkit-appearance:none;z-index:30;position:relative}
+.vinyl-toggle.paused{background:rgba(0,0,0,.75);color:var(--accent);border:1px solid var(--accent)}
+.vinyl-toggle:active{transform:scale(.95)}
+.vinyl-hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:10px;
+  color:var(--muted);letter-spacing:.18em;pointer-events:none;z-index:15}
+
+.navbar{display:flex;border-top:1px solid var(--line);background:#000;flex-shrink:0}
+.nav-btn{flex:1;padding:10px 0 12px;display:flex;flex-direction:column;align-items:center;
+  gap:3px;color:var(--muted);font-size:10px;letter-spacing:.1em;transition:color .2s}
+.nav-btn.active{color:var(--accent)}
+.nav-ico{font-size:16px;line-height:1}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;
+  align-items:center;justify-content:center;padding:30px;z-index:50;backdrop-filter:blur(10px)}
+.modal.show{display:flex;animation:fade .25s ease}
+.modal-card{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;
+  padding:28px 24px;max-width:340px;width:100%;text-align:center}
+.modal-card h3{font-size:15px;color:var(--accent);margin-bottom:12px;letter-spacing:.15em}
+.modal-card p{color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:18px}
+.modal-card button{margin-top:4px;padding:12px 32px;border-radius:30px;background:var(--accent);
+  color:#000;font-size:12px;letter-spacing:.2em;font-weight:600;min-width:160px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="brand" data-i18n="brand">SOUND DOME</div>
+    <div class="lang">
+      <button data-lang="zh" class="active">中</button>
+      <button data-lang="en">EN</button>
+      <button data-lang="ko">한</button>
+    </div>
+  </div>
+
+  <section class="screen landing active" data-screen="home">
+    <div class="qr-box">DOME.LOCAL<br>──────<br>掃碼進入<br>SCAN ME</div>
+    <h1><span data-i18n="title1">傾聽你的聲音</span><br><b data-i18n="title2">化為光球</b></h1>
+    <p data-i18n="lead">用 3 秒聲音，生成屬於你的光球。多次錄音，多顆光球。共構穹頂下的聲景。</p>
+    <button class="cta primary" data-go="record" data-i18n="start">開始錄音</button>
+    <button class="cta" data-go="exhibit" data-i18n="visit">參觀展場</button>
+  </section>
+
+  <section class="screen record-wrap" data-screen="record">
+    <div class="record-hint" data-i18n="recHint">點擊開始 · 將錄音 3 秒</div>
+    <div class="mic-ring" id="micRing">
+      <button class="mic-btn" id="micBtn">
+        <span class="mic-icon">●</span>
+        <span id="micLabel" data-i18n="rec">START</span>
+      </button>
+    </div>
+    <div class="countdown" id="countdown"></div>
+    <canvas class="wave-cv" id="waveCv"></canvas>
+  </section>
+
+  <section class="screen sphere-screen" data-screen="result">
+    <div class="head-row">
+      <h2 data-i18n="yourSphere">你的光球</h2>
+      <span id="resultIdx">#001</span>
+    </div>
+    <canvas class="sphere-cv" id="sphereCv" width="520" height="520"></canvas>
+    <div class="melody-row">
+      <button class="melody-play" id="playBtn">
+        <span id="playIcon">▶</span>
+        <span id="playLabel" data-i18n="preview">試聽旋律</span>
+      </button>
+      <div class="melody-bars" id="melodyBars"></div>
+    </div>
+    <div class="sphere-meta" id="sphereMeta"></div>
+    <div class="actions">
+      <button class="btn-secondary" data-go="record" data-i18n="again">再錄一個</button>
+      <button class="btn-primary" id="saveBtn" data-i18n="save">儲存到展場</button>
+    </div>
+  </section>
+
+  <section class="screen" data-screen="mine">
+    <div class="list-head">
+      <h2 data-i18n="mySpheres">我的光球</h2>
+      <span id="mineCount">0</span>
+    </div>
+    <div class="spheres-grid" id="mineGrid"></div>
+    <div class="empty" id="mineEmpty" data-i18n="emptyMine">尚未生成光球
+回首頁開始錄音</div>
+  </section>
+
+  <section class="screen exhibit-screen" data-screen="exhibit">
+    <canvas class="exhibit-cv" id="exhibitCv"></canvas>
+    <div class="vinyl-overlay">
+      <div class="vinyl-now" id="vinylNow">
+        <span data-i18n="vinylWaiting">等待開始</span>
+      </div>
+      <button class="vinyl-toggle paused" id="vinylToggle" onclick="toggleVinyl()">
+        <span id="vinylToggleLabel" data-i18n="vinylStart">▶ 啟動唱盤</span>
+      </button>
+    </div>
+    <div class="vinyl-hint" data-i18n="vinylHint">唱針掃過 · 自動播放每顆球的旋律</div>
+  </section>
+
+  <nav class="navbar">
+    <button class="nav-btn active" data-go="home">
+      <div class="nav-ico">◐</div><span data-i18n="navHome">首頁</span>
+    </button>
+    <button class="nav-btn" data-go="record">
+      <div class="nav-ico">●</div><span data-i18n="navRec">錄音</span>
+    </button>
+    <button class="nav-btn" data-go="mine">
+      <div class="nav-ico">◇</div><span data-i18n="navMine">我的</span>
+    </button>
+    <button class="nav-btn" data-go="exhibit">
+      <div class="nav-ico">✦</div><span data-i18n="navExhibit">展場</span>
+    </button>
+  </nav>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <h3 id="mTitle"></h3>
+    <p id="mBody"></p>
+    <button onclick="closeModal()" data-i18n="ok">確定</button>
+  </div>
+</div>
+
+<script>
+const I18N = {
+  zh:{brand:"SOUND DOME",title1:"傾聽你的聲音",title2:"化為光球",
+    lead:"用 3 秒聲音，生成屬於你的光球。多次錄音，多顆光球。共構穹頂下的聲景。",
+    start:"開始錄音",visit:"參觀展場",recHint:"點擊開始 · 將錄音 3 秒",
+    rec:"START",recording:"REC",yourSphere:"你的光球",again:"再錄一個",save:"儲存到展場",
+    preview:"試聽旋律",stop:"停止",
+    mySpheres:"我的光球",emptyMine:"尚未生成光球\n回首頁開始錄音",
+    navHome:"首頁",navRec:"錄音",navMine:"我的",navExhibit:"展場",ok:"確定",
+    mAmp:"振幅 / 大小",mFreq:"頻率 / 色相",mComplex:"複雜度 / 紋理",mDyn:"動態 / 光暈",
+    saved:"已加入展場",savedDesc:"你的光球已加入穹頂之中。可隨時在「我的」中查看。",
+    permTitle:"需要麥克風權限",permBody:"請允許瀏覽器使用麥克風以錄製聲音。",
+    vinylStart:"▶ 啟動唱盤",vinylPause:"⏸ 暫停",vinylWaiting:"等待開始",vinylNow:"正在播放",
+    vinylDome:"穹頂主旋律 · 持續迴響",
+    vinylHint:"點擊光球選取 · 經過唱針時播放"},
+  en:{brand:"SOUND DOME",title1:"Listen to your voice",title2:"as a sphere of light",
+    lead:"Three seconds of sound becomes your sphere. Record again, again — together we build the dome.",
+    start:"START RECORDING",visit:"VIEW EXHIBITION",recHint:"Tap to start · 3 seconds",
+    rec:"START",recording:"REC",yourSphere:"YOUR SPHERE",again:"AGAIN",save:"SAVE TO DOME",
+    preview:"PREVIEW MELODY",stop:"STOP",
+    mySpheres:"MY SPHERES",emptyMine:"No spheres yet.\nReturn home to record.",
+    navHome:"Home",navRec:"Record",navMine:"Mine",navExhibit:"Dome",ok:"OK",
+    mAmp:"AMP / SIZE",mFreq:"FREQ / HUE",mComplex:"COMPLEX / TEX",mDyn:"DYNAM / HALO",
+    saved:"Added to dome",savedDesc:"Your sphere now lives in the dome. Find it in “Mine” anytime.",
+    permTitle:"Microphone needed",permBody:"Please allow microphone access to record.",
+    vinylStart:"▶ START",vinylPause:"⏸ PAUSE",vinylWaiting:"Waiting",vinylNow:"Now playing",
+    vinylDome:"Dome melody · always resonating",
+    vinylHint:"Tap to enable · plays when passing the stylus"},
+  ko:{brand:"SOUND DOME",title1:"당신의 목소리를",title2:"빛의 구체로",
+    lead:"3초의 소리가 당신의 빛 구체가 됩니다. 여러 번 녹음하여 돔 아래의 소리 풍경을 함께 만들어요.",
+    start:"녹음 시작",visit:"전시 관람",recHint:"탭하여 시작 · 3초간 녹음",
+    rec:"START",recording:"REC",yourSphere:"당신의 구체",again:"다시 녹음",save:"돔에 저장",
+    preview:"미리듣기",stop:"중지",
+    mySpheres:"내 구체",emptyMine:"아직 구체가 없습니다\n홈에서 녹음을 시작하세요",
+    navHome:"홈",navRec:"녹음",navMine:"내것",navExhibit:"돔",ok:"확인",
+    mAmp:"진폭 / 크기",mFreq:"주파수 / 색상",mComplex:"복잡도 / 질감",mDyn:"다이내믹 / 후광",
+    saved:"돔에 추가됨",savedDesc:"당신의 구체가 돔에 추가되었습니다. 「내것」에서 언제든 볼 수 있습니다.",
+    permTitle:"마이크 권한 필요",permBody:"녹음을 위해 마이크 접근을 허용해주세요.",
+    vinylStart:"▶ 시작",vinylPause:"⏸ 일시정지",vinylWaiting:"대기 중",vinylNow:"재생 중",
+    vinylDome:"돔 메인 멜로디 · 계속 울림",
+    vinylHint:"탭하여 활성화 · 바늘을 지날 때 재생됩니다"}
+};
+let lang = localStorage.getItem('dome.lang') || 'zh';
+let currentSphere = null;
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.dataset.i18n; if(I18N[lang][k]!=null) el.textContent = I18N[lang][k];
+  });
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  if(currentSphere) renderMeta(currentSphere);
+}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{
+  lang=b.dataset.lang; localStorage.setItem('dome.lang',lang); applyI18n();
+});
+
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===name));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.go===name));
+  stopMelody();   // 切畫面就停掉試聽
+  if(name==='mine') renderMine();
+  if(name==='exhibit') startExhibit(); else stopExhibit();
+}
+document.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>go(el.dataset.go));
+
+function getSpheres(){ try { return JSON.parse(localStorage.getItem('dome.spheres')||'[]'); } catch { return []; } }
+function saveSphere(s){ const a=getSpheres(); a.push(s); localStorage.setItem('dome.spheres',JSON.stringify(a)); }
+
+/* ===== 錄音（含 centroid 時間序列）===== */
+const micBtn = document.getElementById('micBtn');
+const micRing = document.getElementById('micRing');
+const cdEl = document.getElementById('countdown');
+const waveCv = document.getElementById('waveCv');
+let audioCtx, analyser, source, stream, recording=false;
+
+async function startRecord(){
+  if(recording) return;
+  try { stream = await navigator.mediaDevices.getUserMedia({
+    audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}
+  }); }
+  catch(e){ openModal(I18N[lang].permTitle, I18N[lang].permBody); return; }
+  recording = true;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  source = audioCtx.createMediaStreamSource(stream);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+  source.connect(analyser);
+
+  micBtn.classList.add('rec'); micRing.classList.add('rec');
+  document.getElementById('micLabel').textContent = I18N[lang].recording;
+
+  const sr = audioCtx.sampleRate;
+  const fftSize = analyser.fftSize;
+  const freqBuf = new Uint8Array(analyser.frequencyBinCount);
+  const timeBuf = new Uint8Array(analyser.fftSize);
+  const samples = [], ampHistory = [], centroidHistory = [];
+  const startT = performance.now(), dur = 3000;
+
+  const wctx = waveCv.getContext('2d');
+  const dpr = window.devicePixelRatio||1;
+  waveCv.width = waveCv.clientWidth*dpr; waveCv.height = waveCv.clientHeight*dpr;
+  wctx.scale(dpr,dpr);
+
+  function tick(){
+    const t = performance.now() - startT;
+    if(t >= dur){ stopRecord(samples, ampHistory, centroidHistory, sr, fftSize); return; }
+    analyser.getByteFrequencyData(freqBuf);
+    analyser.getByteTimeDomainData(timeBuf);
+    samples.push(new Uint8Array(freqBuf));
+
+    // 振幅 RMS（0~1）
+    let sumSq=0; for(let i=0;i<timeBuf.length;i++){const v=(timeBuf[i]-128)/128;sumSq+=v*v;}
+    const rms = Math.sqrt(sumSq/timeBuf.length);
+    ampHistory.push(rms);
+
+    // 頻譜質心（per frame）
+    let total=0, weighted=0;
+    for(let i=0;i<freqBuf.length;i++){
+      total += freqBuf[i];
+      weighted += (i*sr/fftSize) * freqBuf[i];
+    }
+    centroidHistory.push(total>0 ? weighted/total : 0);
+
+    cdEl.textContent = Math.max(0, 3 - Math.floor(t/1000));
+
+    const w=waveCv.clientWidth, h=waveCv.clientHeight;
+    wctx.clearRect(0,0,w,h);
+    wctx.strokeStyle='#ffd700'; wctx.lineWidth=1.2; wctx.beginPath();
+    const step = w/timeBuf.length;
+    for(let i=0;i<timeBuf.length;i++){
+      const y = (timeBuf[i]/255)*h;
+      i?wctx.lineTo(i*step,y):wctx.moveTo(0,y);
+    }
+    wctx.stroke();
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function stopRecord(samples, ampHistory, centroidHistory, sr, fftSize){
+  recording=false;
+  micBtn.classList.remove('rec'); micRing.classList.remove('rec');
+  document.getElementById('micLabel').textContent = I18N[lang].rec;
+  cdEl.textContent = '';
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  if(audioCtx) audioCtx.close();
+
+  // === 球的指紋 ===
+  const amp = Math.min(1, Math.max(0.05, ...ampHistory) * 3);
+
+  const N = samples[0]?.length || 1024;
+  const avg = new Float32Array(N);
+  for(const s of samples) for(let i=0;i<N;i++) avg[i]+=s[i];
+  for(let i=0;i<N;i++) avg[i]/=Math.max(1,samples.length);
+
+  let peakIdx=0, peakVal=0;
+  for(let i=2;i<N;i++){ if(avg[i]>peakVal){peakVal=avg[i];peakIdx=i;} }
+  const peakHz = peakIdx * sr / fftSize;
+  const hue = Math.min(360, Math.max(0,
+    (Math.log2(Math.max(80,peakHz)/80) / Math.log2(2000/80)) * 360));
+
+  let mean=0; for(let i=0;i<N;i++) mean+=avg[i]; mean/=N;
+  let varSum=0; for(let i=0;i<N;i++){const d=avg[i]-mean;varSum+=d*d;}
+  const std = Math.sqrt(varSum/N);
+  const complexity = Math.min(1, std/Math.max(1,mean)/1.5);
+
+  const dynamic = Math.min(1, (Math.max(...ampHistory)-Math.min(...ampHistory))*4);
+
+  // === 旋律原料（壓縮成 32 點存進去）===
+  const centroidSamples = downsample(centroidHistory, 32);
+  const ampSamples = downsample(ampHistory, 32);
+
+  currentSphere = {
+    id:Date.now(), amp, hue, complexity, dynamic, peakHz,
+    seed:Math.random(),
+    centroidSamples, ampSamples
+  };
+  document.getElementById('resultIdx').textContent = '#'+String(getSpheres().length+1).padStart(3,'0');
+  const sBtn = document.getElementById('saveBtn');
+  sBtn.style.display=''; sBtn.disabled=false; sBtn.textContent = I18N[lang].save;
+  drawSphere(document.getElementById('sphereCv'), currentSphere, true);
+  renderMeta(currentSphere);
+  prepareMelody(currentSphere);
+  go('result');
+}
+
+function downsample(arr, n){
+  if(!arr || !arr.length) return new Array(n).fill(0);
+  if(arr.length <= n) {
+    const out = arr.slice();
+    while(out.length < n) out.push(out[out.length-1] || 0);
+    return out;
+  }
+  const out = [];
+  for(let i=0;i<n;i++){
+    const lo = Math.floor((i*arr.length)/n);
+    const hi = Math.max(lo+1, Math.floor(((i+1)*arr.length)/n));
+    let sum = 0;
+    for(let j=lo;j<hi;j++) sum += arr[j];
+    out.push(sum/(hi-lo));
+  }
+  return out;
+}
+
+function renderMeta(s){
+  const t = I18N[lang];
+  document.getElementById('sphereMeta').innerHTML = `
+    <div class="meta-cell"><div class="meta-label">${t.mAmp}</div><div class="meta-val">${(s.amp*100).toFixed(0)}%</div></div>
+    <div class="meta-cell"><div class="meta-label">${t.mFreq}</div><div class="meta-val">${(s.peakHz||0).toFixed(0)} Hz</div></div>
+    <div class="meta-cell"><div class="meta-label">${t.mComplex}</div><div class="meta-val">${(s.complexity*100).toFixed(0)}%</div></div>
+    <div class="meta-cell"><div class="meta-label">${t.mDyn}</div><div class="meta-val">${(s.dynamic*100).toFixed(0)}%</div></div>`;
+}
+
+micBtn.onclick = startRecord;
+
+document.getElementById('saveBtn').onclick = function(){
+  if(!currentSphere) return;
+  saveSphere(currentSphere);
+  this.disabled = true;
+  this.textContent = '✓';
+  openModal(I18N[lang].saved, I18N[lang].savedDesc);
+};
+
+/* ===== 旋律合成 ===== */
+const PENTATONIC = [0, 2, 4, 7, 9];
+const ROOT_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const N_NOTES = 8;
+const BASE_MIDI = 48;        // C3
+const MIN_VEL = 0.15;
+const SILENCE_RMS = 0.02;
+function midiToFreq(m){ return 440 * Math.pow(2, (m-69)/12); }
+
+// 取得旋律原料（新球用 centroidSamples，舊球用 seed 合成 fallback）
+function getMelodySources(s){
+  if(s.centroidSamples && s.ampSamples) {
+    return { centroid: s.centroidSamples, amp: s.ampSamples };
+  }
+  const N = 32;
+  const rng = mulberry32(Math.floor((s.seed||0.5)*1e9));
+  const centroid = [], amp = [];
+  let prev = (s.peakHz || 500);
+  for(let i=0;i<N;i++){
+    prev += (rng()-0.5) * 200 * (s.complexity||0.3);
+    prev = Math.max(80, Math.min(2000, prev));
+    centroid.push(prev);
+    amp.push(0.15 + rng()*0.5*(s.amp||0.5));
+  }
+  return { centroid, amp };
+}
+
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = seed;
+    t = Math.imul(t ^ t>>>15, t | 1);
+    t ^= t + Math.imul(t ^ t>>>7, t | 61);
+    return ((t ^ t>>>14) >>> 0) / 4294967296;
+  };
+}
+
+function generateMelody(s, length){
+  const N = length || N_NOTES;
+  const { centroid: cs, amp: as } = getMelodySources(s);
+
+  // 1. 根音由 hue
+  const rootIdx = Math.floor(((s.hue%360)/360)*12) % 12;
+  const rootMidi = BASE_MIDI + rootIdx;
+  const rootName = ROOT_NAMES[rootIdx];
+
+  // 2. 八度範圍由 amp（球大小）
+  const octaveRange = Math.max(1, Math.min(3, Math.round(1 + s.amp*2)));
+
+  // 3. 波形由 complexity（紋理）
+  let waveform = 'sine';
+  if(s.complexity > 0.7) waveform = 'sawtooth';
+  else if(s.complexity > 0.4) waveform = 'square';
+  else if(s.complexity > 0.15) waveform = 'triangle';
+
+  // 4. 唱片唱針概念：裁掉開頭/結尾的靜音段
+  let lo=0, hi=as.length-1;
+  for(let i=0;i<as.length;i++) if(as[i]>SILENCE_RMS){lo=i;break;}
+  for(let i=as.length-1;i>=lo;i--) if(as[i]>SILENCE_RMS){hi=i;break;}
+  if(hi - lo < 2){ lo=0; hi=as.length-1; }
+  const cTrim = cs.slice(lo, hi+1), aTrim = as.slice(lo, hi+1);
+
+  // 5. 降採樣到 N 個音
+  const len = cTrim.length;
+  const ds = [];
+  for(let i=0;i<N;i++){
+    const a = Math.floor((i*len)/N);
+    const b = Math.max(a+1, Math.floor(((i+1)*len)/N));
+    let cSum=0, aSum=0, n=0;
+    for(let j=a;j<b;j++){ cSum+=cTrim[j]||0; aSum+=aTrim[j]||0; n++; }
+    ds.push({ centroid: n?cSum/n:0, amp: n?aSum/n:0 });
+  }
+
+  // 6. 對齊音域 + 量化到 pentatonic
+  const active = ds.filter(d => d.centroid > 0);
+  const cMin = active.length ? Math.min(...active.map(d=>d.centroid)) : 100;
+  const cMax = active.length ? Math.max(...active.map(d=>d.centroid)) : 2000;
+  const cRange = Math.max(50, cMax-cMin);
+  const stepCount = PENTATONIC.length * octaveRange;
+
+  const notes = ds.map(d=>{
+    const t = Math.max(0, Math.min(1, (d.centroid-cMin)/cRange));
+    const stepIdx = Math.min(stepCount-1, Math.floor(t*stepCount));
+    const oct = Math.floor(stepIdx/PENTATONIC.length);
+    const pent = PENTATONIC[stepIdx % PENTATONIC.length];
+    const midi = rootMidi + oct*12 + pent;
+    const velocity = Math.max(MIN_VEL, Math.min(1, d.amp * 3));
+    return { midi, freq: midiToFreq(midi), velocity };
+  });
+
+  // 7. BPM 由 complexity，cutoff 由 dynamic
+  const bpm = Math.round(100 + s.complexity * 60);  // 100~160
+  const stepSec = 60 / bpm / 2;                      // 8分音符
+  const cutoff = 600 + s.dynamic * 5400;             // 600~6000 Hz
+
+  return { notes, rootMidi, rootName, octaveRange, waveform, bpm, stepSec, cutoff };
+}
+
+/* ===== 旋律播放 ===== */
+let playCtx = null;
+let melodyPlaying = false;
+let melodyScheduled = [];
+let melodyTimers = [];
+let melodyEndTimer = null;
+let activeMelody = null;
+let activeBarsContainer = null;   // 哪個 .melody-bars 要高亮（結果頁 vs 唱片 vs null）
+let activeSphereCallback = null;  // 唱片模式：通知 active 球（用於外圈光暈）
+
+function ensurePlayCtx(){
+  if(!playCtx) playCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(playCtx.state === 'suspended') playCtx.resume();
+}
+
+function prepareMelody(s){
+  activeMelody = generateMelody(s);
+  renderMelodyBars(document.getElementById('melodyBars'), activeMelody);
+}
+
+function renderMelodyBars(container, m){
+  if(!container) return;
+  container.innerHTML = '';
+  const midis = m.notes.map(n=>n.midi);
+  const mn = Math.min(...midis), mx = Math.max(...midis);
+  const range = Math.max(1, mx-mn);
+  m.notes.forEach(n=>{
+    const b = document.createElement('div');
+    b.className = 'bar';
+    b.style.height = (15 + ((n.midi-mn)/range)*85) + '%';
+    container.appendChild(b);
+  });
+}
+
+function highlightBar(container, idx){
+  if(!container) return;
+  container.querySelectorAll('.bar').forEach((b,i)=>b.classList.toggle('active', i===idx));
+}
+
+function playMelody(m, opts){
+  ensurePlayCtx();
+  stopMelody();
+  if(!m) return;
+  activeMelody = m;
+  melodyPlaying = true;
+  activeBarsContainer = opts?.barsContainer || null;
+  activeSphereCallback = opts?.onActiveSphere || null;
+
+  const t0 = playCtx.currentTime + 0.05;
+
+  const filter = playCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = m.cutoff;
+  filter.Q.value = 1.2;
+  const masterGain = playCtx.createGain();
+  masterGain.gain.value = 0.3;
+  filter.connect(masterGain);
+  masterGain.connect(playCtx.destination);
+
+  m.notes.forEach((note, i)=>{
+    const startT = t0 + i * m.stepSec;
+    const dur = m.stepSec * 0.85;
+
+    const ms = (startT - playCtx.currentTime) * 1000;
+    melodyTimers.push(setTimeout(()=>{ highlightBar(activeBarsContainer, i); }, ms));
+
+    const osc = playCtx.createOscillator();
+    osc.type = m.waveform;
+    osc.frequency.value = note.freq;
+    const env = playCtx.createGain();
+    env.gain.value = 0;
+    osc.connect(env); env.connect(filter);
+
+    const peak = note.velocity * 0.7;
+    env.gain.setValueAtTime(0, startT);
+    env.gain.linearRampToValueAtTime(peak, startT + 0.01);
+    env.gain.linearRampToValueAtTime(peak*0.6, startT + dur*0.4);
+    env.gain.linearRampToValueAtTime(0, startT + dur);
+    osc.start(startT);
+    osc.stop(startT + dur + 0.05);
+    melodyScheduled.push({osc, env});
+  });
+
+  const totalMs = m.notes.length * m.stepSec * 1000;
+  melodyEndTimer = setTimeout(()=>{
+    melodyPlaying = false;
+    highlightBar(activeBarsContainer, -1);
+    setPlayBtn(false);
+    if(opts?.onEnd) opts.onEnd();
+  }, totalMs + 100);
+}
+
+function stopMelody(){
+  melodyTimers.forEach(t=>clearTimeout(t));
+  melodyTimers = [];
+  if(melodyEndTimer){ clearTimeout(melodyEndTimer); melodyEndTimer = null; }
+  if(playCtx) {
+    melodyScheduled.forEach(({osc, env})=>{
+      try {
+        const now = playCtx.currentTime;
+        env.gain.cancelScheduledValues(now);
+        env.gain.linearRampToValueAtTime(0, now+0.03);
+        osc.stop(now+0.05);
+      } catch{}
+    });
+  }
+  melodyScheduled = [];
+  highlightBar(activeBarsContainer, -1);
+  melodyPlaying = false;
+  setPlayBtn(false);
+}
+
+function setPlayBtn(playing){
+  const ic = document.getElementById('playIcon');
+  const lb = document.getElementById('playLabel');
+  const btn = document.getElementById('playBtn');
+  if(!ic||!lb||!btn) return;
+  if(playing){
+    ic.textContent = '⏹';
+    lb.textContent = I18N[lang].stop;
+    btn.classList.add('playing');
+  } else {
+    ic.textContent = '▶';
+    lb.textContent = I18N[lang].preview;
+    btn.classList.remove('playing');
+  }
+}
+
+document.getElementById('playBtn').onclick = ()=>{
+  if(melodyPlaying){ stopMelody(); return; }
+  if(!activeMelody && currentSphere) prepareMelody(currentSphere);
+  if(activeMelody){
+    setPlayBtn(true);
+    playMelody(activeMelody, {
+      barsContainer: document.getElementById('melodyBars'),
+      onEnd: ()=>setPlayBtn(false)
+    });
+  }
+};
+
+/* ===== 球體繪製 ===== */
+function drawSphere(canvas, s, animate){
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2;
+  const baseR = (W*0.18) + s.amp*(W*0.28);
+
+  if(canvas._rafId) cancelAnimationFrame(canvas._rafId);
+
+  function frame(t){
+    ctx.clearRect(0,0,W,H);
+    const time = animate ? t*0.0006 : 1.2;
+
+    const haloR = baseR * (1.7 + Math.sin(time*1.5)*0.06*s.dynamic);
+    const g1 = ctx.createRadialGradient(cx,cy,baseR*0.6,cx,cy,haloR);
+    g1.addColorStop(0,`hsla(${s.hue},85%,60%,${0.3+s.dynamic*0.4})`);
+    g1.addColorStop(1,`hsla(${s.hue},85%,30%,0)`);
+    ctx.fillStyle = g1;
+    ctx.beginPath(); ctx.arc(cx,cy,haloR,0,Math.PI*2); ctx.fill();
+
+    const g2 = ctx.createRadialGradient(cx-baseR*0.3,cy-baseR*0.3,baseR*0.1,cx,cy,baseR);
+    g2.addColorStop(0,`hsla(${s.hue},95%,88%,1)`);
+    g2.addColorStop(0.5,`hsla(${s.hue},90%,55%,1)`);
+    g2.addColorStop(1,`hsla(${(s.hue+30)%360},85%,18%,1)`);
+    ctx.fillStyle = g2;
+    ctx.beginPath(); ctx.arc(cx,cy,baseR,0,Math.PI*2); ctx.fill();
+
+    const rings = Math.floor(2 + s.complexity*7);
+    ctx.globalCompositeOperation = 'overlay';
+    for(let i=0;i<rings;i++){
+      const phase = time + i*0.6 + s.seed*8;
+      const rr = baseR*(0.3 + (i/rings)*0.7) + Math.sin(phase)*baseR*0.04*s.dynamic;
+      ctx.strokeStyle = `hsla(${(s.hue+i*25)%360},90%,72%,${0.15+s.complexity*0.35})`;
+      ctx.lineWidth = 1 + s.complexity*1.4;
+      ctx.beginPath(); ctx.arc(cx,cy,rr,0,Math.PI*2); ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    const pts = Math.floor(8 + s.complexity*22);
+    for(let i=0;i<pts;i++){
+      const a = (i/pts)*Math.PI*2 + time*0.5 + s.seed*6;
+      const rr = baseR*(1.1 + Math.sin(time*2+i)*0.08);
+      const px = cx + Math.cos(a)*rr, py = cy + Math.sin(a)*rr;
+      ctx.fillStyle = `hsla(${s.hue},90%,75%,0.55)`;
+      ctx.beginPath(); ctx.arc(px,py, 1.5 + s.dynamic*2, 0, Math.PI*2); ctx.fill();
+    }
+
+    ctx.fillStyle = `hsla(${s.hue},100%,95%,0.45)`;
+    ctx.beginPath(); ctx.arc(cx-baseR*0.35, cy-baseR*0.35, baseR*0.18, 0, Math.PI*2); ctx.fill();
+
+    if(animate) canvas._rafId = requestAnimationFrame(frame);
+  }
+  frame(0);
+}
+
+/* ===== 我的光球 ===== */
+function renderMine(){
+  const arr = getSpheres();
+  document.getElementById('mineCount').textContent = String(arr.length).padStart(3,'0');
+  const grid = document.getElementById('mineGrid');
+  const empty = document.getElementById('mineEmpty');
+  grid.innerHTML = '';
+  empty.style.display = arr.length ? 'none' : 'block';
+  grid.style.display = arr.length ? 'grid' : 'none';
+  arr.slice().reverse().forEach((s, revIdx)=>{
+    const cell = document.createElement('div');
+    cell.className = 'sphere-cell';
+    const idx = arr.length-revIdx;
+    const idxLbl = document.createElement('div');
+    idxLbl.className = 'cell-idx';
+    idxLbl.textContent = '#'+String(idx).padStart(3,'0');
+    cell.appendChild(idxLbl);
+    const c = document.createElement('canvas');
+    c.width = 180; c.height = 180;
+    cell.appendChild(c);
+    grid.appendChild(cell);
+    drawSphere(c, s, false);
+    cell.onclick = ()=>{
+      currentSphere = s;
+      document.getElementById('resultIdx').textContent = '#'+String(idx).padStart(3,'0');
+      document.getElementById('saveBtn').style.display = 'none';
+      drawSphere(document.getElementById('sphereCv'), s, true);
+      renderMeta(s);
+      prepareMelody(s);
+      setPlayBtn(false);
+      go('result');
+    };
+  });
+}
+
+/* ===== 唱片展場（主旋律循環 + 點擊光球觸發） ===== */
+const exCv = document.getElementById('exhibitCv');
+let exRaf = null;
+let vinylRunning = false;
+let vinylAngle = 0;
+let vinylSpheres = [];
+let vinylRadius = 0;
+let vinylCx = 0, vinylCy = 0;
+let tappedSphereIdx = -1;
+let tappedFlashUntil = 0;
+let lastTriggeredIdx = -1;
+const STYLUS_ANGLE = -Math.PI/2 + 0.35;   // 唱針讀取點（約 1 點鐘方向）
+const STYLUS_TOLERANCE = 0.18;             // 弧度容忍（球進入此角度範圍即觸發）
+
+// 主旋律狀態（與 sphere tap 分離）
+let bgMelody = null;
+let bgScheduled = [];
+let bgEndTimer = null;
+let bgRunning = false;
+
+function startExhibit(){
+  if(exRaf) return;
+  const ctx = exCv.getContext('2d');
+  const dpr = window.devicePixelRatio||1;
+  exCv.width = exCv.clientWidth*dpr; exCv.height = exCv.clientHeight*dpr;
+
+  const saved = getSpheres();
+  vinylSpheres = (saved.length ? saved : Array.from({length:8},(_,i)=>({
+    id:i, amp:0.35+Math.random()*0.4, hue:Math.random()*360,
+    complexity:Math.random()*0.7, dynamic:Math.random(),
+    peakHz:200+Math.random()*1500, seed:Math.random()
+  }))).map((s, i, arr)=>({
+    ...s,
+    baseAngle: (i / arr.length) * Math.PI * 2 - Math.PI/2
+  }));
+  tappedSphereIdx = -1;
+  vinylAngle = 0;
+  setVinylNow(I18N[lang].vinylWaiting, null);
+
+  // 點擊光球觸發旋律
+  exCv.style.touchAction = 'manipulation';
+  exCv.onpointerdown = (e)=>{
+    ensurePlayCtx();
+    const rect = exCv.getBoundingClientRect();
+    const d = window.devicePixelRatio||1;
+    const x = (e.clientX - rect.left) * d;
+    const y = (e.clientY - rect.top) * d;
+    handleSphereTap(x, y);
+  };
+
+  let lastT = performance.now();
+  function loop(now){
+    const dt = (now - lastT) / 1000;
+    lastT = now;
+    // 唱盤旋轉速度（慢到能看清楚 opened 球往唱針逼近）
+    vinylAngle += dt * 0.22;
+    drawVinyl(ctx);
+    detectOpenedAtStylus();
+    exRaf = requestAnimationFrame(loop);
+  }
+  exRaf = requestAnimationFrame(loop);
+}
+
+function stopExhibit(){
+  if(exRaf){ cancelAnimationFrame(exRaf); exRaf=null; }
+  vinylRunning = false;
+  setVinylBtn(false);
+  stopBackgroundMelody();
+  stopMelody();
+  tappedSphereIdx = -1;
+  if(exCv) exCv.onpointerdown = null;
+}
+
+function toggleVinyl(){
+  ensurePlayCtx();
+  vinylRunning = !vinylRunning;
+  setVinylBtn(vinylRunning);
+  if(vinylRunning){
+    // 啟動 → 產生並循環播放穹頂主旋律
+    bgMelody = generateMainMelody(vinylSpheres);
+    bgRunning = true;
+    playBackgroundMelody(bgMelody);
+    setVinylNow(I18N[lang].vinylDome, null);
+  } else {
+    stopBackgroundMelody();
+    stopMelody();
+    tappedSphereIdx = -1;
+    setVinylNow(I18N[lang].vinylWaiting, null);
+  }
+}
+
+function setVinylBtn(running){
+  const btn = document.getElementById('vinylToggle');
+  const lbl = document.getElementById('vinylToggleLabel');
+  if(running){
+    btn.classList.remove('paused');
+    lbl.textContent = I18N[lang].vinylPause;
+  } else {
+    btn.classList.add('paused');
+    lbl.textContent = I18N[lang].vinylStart;
+  }
+}
+
+function setVinylNow(text, sphere, melody){
+  const el = document.getElementById('vinylNow');
+  if(sphere && melody){
+    el.innerHTML = `<span style="opacity:.7">${I18N[lang].vinylNow}</span> <b>#${String(sphere._idx+1).padStart(3,'0')}</b>
+      &nbsp;·&nbsp; <span style="color:hsl(${sphere.hue},85%,65%)">${melody.rootName}</span>
+      <div class="vinyl-bars" id="vinylBars"></div>`;
+    const bars = el.querySelector('.vinyl-bars');
+    const midis = melody.notes.map(n=>n.midi);
+    const mn = Math.min(...midis), mx = Math.max(...midis);
+    const range = Math.max(1, mx-mn);
+    melody.notes.forEach(n=>{
+      const b = document.createElement('div');
+      b.className = 'bar';
+      b.style.height = (4 + ((n.midi-mn)/range)*16) + 'px';
+      bars.appendChild(b);
+    });
+    activeBarsContainer = bars;
+  } else {
+    el.textContent = text || I18N[lang].vinylWaiting;
+    activeBarsContainer = null;
+  }
+}
+
+/* ===== 點擊光球：切換選取狀態（不直接播） ===== */
+function handleSphereTap(x, y){
+  const ringR = vinylRadius * 0.66;
+  let hitIdx = -1, hitDist = Infinity;
+  vinylSpheres.forEach((s, i)=>{
+    const a = s.baseAngle + vinylAngle;
+    const px = vinylCx + Math.cos(a) * ringR;
+    const py = vinylCy + Math.sin(a) * ringR;
+    const r = (8 + s.amp * 16) * (window.devicePixelRatio||1);
+    const d = Math.hypot(x - px, y - py);
+    if(d < r * 2.4 && d < hitDist){ hitIdx = i; hitDist = d; }
+  });
+  if(hitIdx < 0) return;
+  const s = vinylSpheres[hitIdx];
+  s.opened = !s.opened;
+  // 關閉時若該球正在播放，淡出
+  if(!s.opened && tappedSphereIdx === hitIdx){
+    stopMelody();
+    tappedSphereIdx = -1;
+  }
+  // 重置觸發追蹤，讓下次經過唱針時能再次發聲
+  lastTriggeredIdx = -1;
+  // 第一次選取時自動啟動唱盤（讓使用者立刻聽到效果）
+  if(s.opened && !vinylRunning){ toggleVinyl(); }
+}
+
+/* ===== 偵測經過唱針的開啟光球 ===== */
+function detectOpenedAtStylus(){
+  if(!bgRunning) return;
+  let nearestIdx = -1, nearestDiff = Infinity;
+  vinylSpheres.forEach((s, i)=>{
+    if(!s.opened) return;
+    const a = s.baseAngle + vinylAngle;
+    let diff = ((a - STYLUS_ANGLE) % (Math.PI*2));
+    while(diff > Math.PI) diff -= Math.PI*2;
+    while(diff < -Math.PI) diff += Math.PI*2;
+    const ad = Math.abs(diff);
+    if(ad < nearestDiff){ nearestDiff = ad; nearestIdx = i; }
+  });
+  if(nearestIdx >= 0 && nearestDiff < STYLUS_TOLERANCE){
+    if(nearestIdx !== lastTriggeredIdx){
+      lastTriggeredIdx = nearestIdx;
+      triggerSphereMelody(vinylSpheres[nearestIdx], nearestIdx);
+    }
+  } else {
+    // 沒有 opened 球在唱針附近 → 重置，讓下次有球進入時能觸發
+    lastTriggeredIdx = -1;
+  }
+}
+
+function triggerSphereMelody(s, idx){
+  tappedSphereIdx = idx;
+  tappedFlashUntil = performance.now() + 600;
+  const m = generateMelody(s);
+  setVinylNow(null, s, m);
+  playMelody(m, {
+    barsContainer: activeBarsContainer,
+    onEnd: ()=>{
+      tappedSphereIdx = -1;
+      if(vinylRunning) setVinylNow(I18N[lang].vinylDome, null);
+      else setVinylNow(I18N[lang].vinylWaiting, null);
+    }
+  });
+}
+
+/* ===== 主旋律生成（從所有球的集體聲音平均） ===== */
+function generateMainMelody(spheres){
+  const N = 32;
+  let domeSphere;
+  if(!spheres.length){
+    // 沒有球時用內建 ambient 序列
+    domeSphere = {
+      hue: 210, amp: 0.5, complexity: 0.15, dynamic: 0.6, seed: 0.5,
+      centroidSamples: Array.from({length:N},(_,i)=>250 + Math.sin(i*0.4)*180 + i*5),
+      ampSamples: Array.from({length:N},(_,i)=>0.25 + 0.18*Math.sin(i*0.5))
+    };
+  } else {
+    const avgC = new Array(N).fill(0);
+    const avgA = new Array(N).fill(0);
+    let agg = { hue:0, amp:0, complexity:0, dynamic:0 };
+    spheres.forEach(s=>{
+      const { centroid: cs, amp: as } = getMelodySources(s);
+      for(let i=0;i<N;i++){
+        avgC[i] += (cs[i] || 0);
+        avgA[i] += (as[i] || 0);
+      }
+      agg.hue += s.hue; agg.amp += s.amp;
+      agg.complexity += s.complexity; agg.dynamic += s.dynamic;
+    });
+    const n = spheres.length;
+    for(let i=0;i<N;i++){ avgC[i] /= n; avgA[i] /= n; }
+    domeSphere = {
+      hue: agg.hue/n, amp: agg.amp/n,
+      complexity: 0.1,                  // 強制壓低 = 緩慢柔和
+      dynamic: agg.dynamic/n, seed: 0.5,
+      centroidSamples: avgC, ampSamples: avgA
+    };
+  }
+  const m = generateMelody(domeSphere, 16);   // 較長 16 音
+  // 覆蓋為 ambient pad 性質
+  m.waveform = 'sine';
+  m.bpm = 56;
+  m.stepSec = 60 / m.bpm / 2;                 // 8分音符 ~0.535s
+  m.cutoff = Math.min(1800, m.cutoff * 0.55); // 偏暖
+  return m;
+}
+
+/* ===== 主旋律循環播放（與 sphere tap 分離的 audio chain） ===== */
+function playBackgroundMelody(m){
+  ensurePlayCtx();
+  stopBackgroundMelody();
+  bgRunning = true;
+  scheduleBackgroundLoop(m, playCtx.currentTime + 0.1);
+}
+
+function scheduleBackgroundLoop(m, t0){
+  if(!bgRunning) return;
+  const filter = playCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = m.cutoff;
+  filter.Q.value = 0.9;
+  const gain = playCtx.createGain();
+  gain.gain.value = 0.14;             // 較低音量讓 sphere tap 能浮出
+  filter.connect(gain);
+  gain.connect(playCtx.destination);
+
+  m.notes.forEach((note, i)=>{
+    const startT = t0 + i * m.stepSec;
+    const dur = m.stepSec * 0.95;
+    const osc = playCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = note.freq;
+    const env = playCtx.createGain();
+    env.gain.value = 0;
+    osc.connect(env); env.connect(filter);
+    const peak = note.velocity * 0.55;
+    env.gain.setValueAtTime(0, startT);
+    env.gain.linearRampToValueAtTime(peak, startT + dur*0.25);
+    env.gain.linearRampToValueAtTime(peak*0.7, startT + dur*0.7);
+    env.gain.linearRampToValueAtTime(0, startT + dur);
+    osc.start(startT);
+    osc.stop(startT + dur + 0.1);
+    bgScheduled.push({osc, env});
+  });
+
+  const totalMs = m.notes.length * m.stepSec * 1000;
+  bgEndTimer = setTimeout(()=>{
+    bgScheduled = bgScheduled.slice(-2);       // 釋放已完成的引用
+    if(bgRunning) scheduleBackgroundLoop(m, playCtx.currentTime + 0.02);
+  }, totalMs);
+}
+
+function stopBackgroundMelody(){
+  bgRunning = false;
+  if(bgEndTimer){ clearTimeout(bgEndTimer); bgEndTimer = null; }
+  if(playCtx){
+    bgScheduled.forEach(({osc, env})=>{
+      try {
+        const now = playCtx.currentTime;
+        env.gain.cancelScheduledValues(now);
+        env.gain.linearRampToValueAtTime(0, now+0.1);
+        osc.stop(now+0.15);
+      } catch{}
+    });
+  }
+  bgScheduled = [];
+}
+
+/* ===== 唱片視覺繪製（無唱針，純裝飾） ===== */
+function drawVinyl(ctx){
+  const W = exCv.width, H = exCv.height;
+  vinylCx = W/2; vinylCy = H/2;
+  vinylRadius = Math.min(W, H) * 0.42;
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  ctx.fillRect(0,0,W,H);
+
+  // 唱盤底
+  const grd = ctx.createRadialGradient(vinylCx, vinylCy, vinylRadius*0.1, vinylCx, vinylCy, vinylRadius);
+  grd.addColorStop(0, '#1a1a1a');
+  grd.addColorStop(0.7, '#0d0d0d');
+  grd.addColorStop(1, '#050505');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(vinylCx, vinylCy, vinylRadius, 0, Math.PI*2); ctx.fill();
+
+  // 凹槽
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 1;
+  for(let r = vinylRadius*0.2; r < vinylRadius; r += 6){
+    ctx.beginPath(); ctx.arc(vinylCx, vinylCy, r, 0, Math.PI*2); ctx.stroke();
+  }
+
+  // 中央 DOME 標籤
+  ctx.save();
+  ctx.translate(vinylCx, vinylCy);
+  ctx.rotate(vinylAngle);
+  const labelR = vinylRadius * 0.2;
+  ctx.fillStyle = '#1a1408';
+  ctx.beginPath(); ctx.arc(0,0,labelR,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle = bgRunning ? 'rgba(255,215,0,0.8)' : 'rgba(255,215,0,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(0,0,labelR,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,215,0,0.85)';
+  ctx.font = `bold ${Math.floor(labelR*0.32)}px monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('DOME', 0, -labelR*0.22);
+  ctx.fillStyle = 'rgba(255,215,0,0.55)';
+  ctx.font = `${Math.floor(labelR*0.16)}px monospace`;
+  ctx.fillText(`${vinylSpheres.length} TRACKS`, 0, labelR*0.22);
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(0,0, labelR*0.08, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // 球（隨唱盤旋轉，可點擊）
+  const ringR = vinylRadius * 0.66;
+  const flashing = performance.now() < tappedFlashUntil;
+  vinylSpheres.forEach((s, i)=>{
+    s._idx = i;
+    const a = s.baseAngle + vinylAngle;
+    const px = vinylCx + Math.cos(a) * ringR;
+    const py = vinylCy + Math.sin(a) * ringR;
+    const isActive = (i === tappedSphereIdx);
+    const pulse = isActive ? (1 + 0.15*Math.sin(performance.now()*0.012)) : 1;
+    const r = (8 + s.amp * 16) * (isActive ? 1.35 : 1) * pulse;
+
+    // 光暈
+    const halo = r * (isActive ? 3 : 1.8);
+    const g = ctx.createRadialGradient(px, py, r*0.3, px, py, halo);
+    g.addColorStop(0, `hsla(${s.hue},90%,68%,${isActive ? 0.9 : 0.4})`);
+    g.addColorStop(1, `hsla(${s.hue},85%,30%,0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(px, py, halo, 0, Math.PI*2); ctx.fill();
+
+    // 球體
+    const cg = ctx.createRadialGradient(px-r*0.3, py-r*0.3, r*0.1, px, py, r);
+    cg.addColorStop(0, `hsla(${s.hue},95%,90%,1)`);
+    cg.addColorStop(1, `hsla(${(s.hue+30)%360},80%,28%,1)`);
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2); ctx.fill();
+
+    // opened 狀態：始終可見的金環 + 頂部小圓點
+    if(s.opened && !isActive){
+      ctx.strokeStyle = 'rgba(255,215,0,0.85)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(px, py, r+4, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,215,0,1)';
+      ctx.beginPath(); ctx.arc(px, py - r - 7, 2.5, 0, Math.PI*2); ctx.fill();
+    }
+    // active（正在播）環 + 漣漪
+    if(isActive){
+      ctx.strokeStyle = `hsla(${s.hue},90%,75%,0.95)`;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(px, py, r+5, 0, Math.PI*2); ctx.stroke();
+      if(flashing){
+        const flashAge = 1 - (tappedFlashUntil - performance.now()) / 600;
+        ctx.strokeStyle = `hsla(${s.hue},95%,80%,${1 - flashAge})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(px, py, r + 8 + flashAge*30, 0, Math.PI*2); ctx.stroke();
+      }
+    }
+  });
+
+  // 唱針臂（固定角度，讀取點在 STYLUS_ANGLE）
+  const stylusTipX = vinylCx + Math.cos(STYLUS_ANGLE) * ringR;
+  const stylusTipY = vinylCy + Math.sin(STYLUS_ANGLE) * ringR;
+  const stylusBaseX = W * 0.92;
+  const stylusBaseY = H * 0.10;
+  // 臂
+  ctx.strokeStyle = 'rgba(255,215,0,0.82)';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(stylusBaseX, stylusBaseY);
+  ctx.lineTo(stylusTipX, stylusTipY);
+  ctx.stroke();
+  // 基座
+  ctx.fillStyle = '#1a1a1a';
+  ctx.strokeStyle = 'rgba(255,215,0,0.7)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(stylusBaseX, stylusBaseY, 10, 0, Math.PI*2);
+  ctx.fill(); ctx.stroke();
+  // 針頭
+  ctx.fillStyle = '#ffd700';
+  ctx.beginPath(); ctx.arc(stylusTipX, stylusTipY, 5, 0, Math.PI*2); ctx.fill();
+  // 針頭光暈（播放中強化）
+  const stylusGlow = (tappedSphereIdx >= 0) ? 0.7 : 0.3;
+  ctx.fillStyle = `rgba(255,215,0,${stylusGlow})`;
+  ctx.beginPath(); ctx.arc(stylusTipX, stylusTipY, 13, 0, Math.PI*2); ctx.fill();
+}
+
+/* ===== Modal ===== */
+function openModal(t,b){
+  document.getElementById('mTitle').textContent=t;
+  document.getElementById('mBody').textContent=b;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+document.getElementById('modal').onclick = (e)=>{ if(e.target.id==='modal') closeModal(); };
+
+applyI18n();
+</script>
+</body>
+</html>
